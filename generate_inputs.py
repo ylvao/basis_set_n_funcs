@@ -276,7 +276,7 @@ def find_xyz_file(system):
 
 
 # Global
-functional = ["gga_c_N12"]
+functional = ["lda_x", "gga_x_b88"]
 system     = ["BF", "BH", "C4H6"]
 geom_file  = [find_xyz_file(sys) for sys in system]
 

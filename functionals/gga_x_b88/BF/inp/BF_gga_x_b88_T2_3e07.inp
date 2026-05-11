@@ -1,0 +1,42 @@
+# vim:syntax=sh:
+
+world_prec = 3e-07               # Overall relative precision
+world_unit = angstrom
+
+MPI {
+  numerically_exact = true        # Guarantee identical results in MPI
+  omp_threads = 16
+}
+
+Molecule {
+  charge = 0
+  multiplicity = 1
+$coords
+B    0.000000000000   0.000000000000  -0.633450000000
+F    0.000000000000   0.000000000000   0.633450000000
+$end
+}
+
+Basis {
+  order = 10
+}
+
+WaveFunction {
+  method = DFT                   # Wave function method (HF or DFT)
+  restricted = true
+}
+
+DFT {
+  functionals = gga_x_b88
+  xc_library = libxc
+}
+
+Properties {
+  dipole_moment = true
+}
+
+SCF {
+    energy_thrs = 3e-08
+    orbital_thrs = 0.0002
+}
+
