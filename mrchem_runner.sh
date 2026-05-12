@@ -5,7 +5,7 @@
 #SBATCH --error=%j.err
 
 
-#SBATCH --job-name=test
+#SBATCH --job-name=mrchem_func_tester
 #SBATCH --time=0-10:00:00
 #SBATCH --nodes=8
 #SBATCH --ntasks-per-node=256
