@@ -3,8 +3,15 @@ import os
 from get_xyz import extract_geometry
 from mw_settings import calculate_energy_metrics
 
+
+
+
 def create_mrchem_runner(molecule_name, functional, e_rel, Tn):
     filename = f"runners/{molecule_name}_{functional}_{Tn}_{e_rel}.sh"
+
+    if os.path.exists(f"functionals/{functional}/{molecule_name}/{molecule_name}_{functional}_{Tn}_{e_rel}.out"):
+        if check_orca_termination(f"functionals/{functional}/{molecule_name}/{molecule_name}_{functional}_{Tn}_{e_rel}.out"):
+            return print(f"Outfile already exists for: {molecule_name}_{functional}_{Tn}_{e_rel}")
     if os.path.exists(filename):
         return print(f"Runner file already exists for: {molecule_name}_{functional}_{Tn}_{e_rel}")
     template_str = """#!/bin/bash
@@ -49,7 +56,9 @@ def create_mrchem_input(geometry, molecule_name, functional, Tn, e_rel, order, e
 
     create_mrchem_runner(molecule_name, functional, filename_prec, Tn)
     if os.path.exists(f"functionals/{functional}/{molecule_name}/inp/{molecule_name}_{functional}_{Tn}_{filename_prec}.inp"):
-        return print(f"Input  file already exists for: {molecule_name}_{functional}_{Tn}_{e_rel}")
+        if os.path.exists(f"functionals/{functional}/{molecule_name}/inp/{molecule_name}_{functional}_{Tn}_{filename_prec}.out"):
+            if check_orca_termination(f"functionals/{functional}/{molecule_name}/{molecule_name}_{functional}_{Tn}_{e_rel}.out"):
+                return print(f"Inpfile  already exists for: {molecule_name}_{functional}_{Tn}_{e_rel}")
 
     template_str = """# vim:syntax=sh:
 
@@ -144,26 +153,27 @@ SCF {
 def create_orca_runner(molecule_name, functional, basis_set):
     filename = f"runners/{molecule_name}_{functional}_{basis_set}.sh"
 
+    if os.path.exists(f"functionals/{functional}/{molecule_name}/{molecule_name}_{functional}_{basis_set}.out"):
+        if check_orca_termination(f"functionals/{functional}/{molecule_name}/{molecule_name}_{functional}_{basis_set}.out"):
+            return print(f"Outfile already exists for: {molecule_name}_{functional}_{basis_set}")
     if os.path.exists(filename):
         return print(f"Runner file already exists for: {molecule_name}_{functional}_{basis_set}")
 
     template_str = """#!/bin/bash
 
-cd ..
+script_dir=$(pwd)
 
 # Calc parameters
 mol="param_mol"
 func="param_func"
-t="param_t"
-prec="param_prec"
+basis="param_basis"
 
-abs="/cluster/projects/nn14654k/ylvaos/basis_set_n_funcs"
 dir="functionals/$func/$mol"
 name="${mol}_${func}_${basis}"
 
-abs_dir="$abs/$dir"
-cd "$abs_dir/out" || exit 1
-sbatch "$abs/mrchem_runner.sh" "$abs_dir" "$name"
+abs_dir="$script_dir/$dir"
+cd "$script_dir/$dir/out" || exit 1
+sbatch "$script_dir/orca_runner.sh" "$abs_dir" "$name"
 
 """
     # Fill the template
@@ -187,7 +197,9 @@ def create_orca_input(geometry, molecule_name, functional, basis_set, xc_type):
 
     create_orca_runner(molecule_name, functional, basis_set_format)
     if os.path.exists(f"functionals/{functional}/{molecule_name}/inp/{molecule_name}_{functional}_{basis_set_format}.inp"):
-        return print(f"Input  file already exists for: {molecule_name}_{molecule_name}_{functional}_{basis_set_format}")
+        if os.path.exists(f"functionals/{functional}/{molecule_name}/inp/{molecule_name}_{functional}_{basis_set_format}.out"):
+            if check_orca_termination(f"functionals/{functional}/{molecule_name}/{molecule_name}_{functional}_{basis_set}.out"):
+                return print(f"Inpfile  already exists for: {molecule_name}_{functional}_{basis_set}")
 
     template_str = """! dft param_basis TightSCF
 %pal nprocs 8 end
@@ -274,6 +286,26 @@ def find_xyz_file(system):
         raise FileNotFoundError(f"No XYZ file found for system '{system}' in {geometries_dir}")
     return os.path.join(geometries_dir, matching_files[0])
 
+def check_orca_termination(file_path):
+    target = "****ORCA TERMINATED NORMALLY****"
+
+    with open(file_path, 'r') as f:
+        for line in f:
+            if target in line:
+                return True
+    return False
+
+def check_mrchem_termination(file_path):
+    target = "Exiting MRChem"
+
+    with open(file_path, 'r') as f:
+        for line in f:
+            if target in line:
+                return True
+    return False
+
+
+
 
 # Global
 functional = ["lda_x", "gga_x_b88"]
@@ -287,7 +319,7 @@ e_abs, e_rel, order, e_conv, e_orb = zip(*mw_params)
 
 # Orca
 basis_set  = "cc-pVDZ"
-xc_type = "correlation" # functional, exchange or correlation
+xc_type = "exchange" # functional, exchange or correlation
 
 for func in functional:
     for sys in range(len(system)):

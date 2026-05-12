@@ -31,7 +31,6 @@ rm -rf checkpoint
 rm -rf orbitals
 rm -rf plots
 cp "$dir/out/$name.out" "$dir"
-cp "$dir/out/$name.json" "$dir"
 
 exit 0
 

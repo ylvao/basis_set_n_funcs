@@ -3,10 +3,13 @@ import re
 import json
 from pathlib import Path
 
-def extract_dipole_moments(name, file_path):
+def extract_properties(name, file_path):
 
-    # Load JSON first and check if 'name' exists
-    json_file = Path("data.json")
+    json_file = Path("results/data.json")
+    all_data = {}
+    
+    # Ensure directory exists
+    json_file.parent.mkdir(parents=True, exist_ok=True)
     
     if json_file.exists():
         try:
@@ -15,10 +18,13 @@ def extract_dipole_moments(name, file_path):
         except json.JSONDecodeError:
             all_data = {}
 
+    # Logic Change: Check if entry exists AND if it is complete
     if name in all_data:
-        # Simply exit the function if the data is already there
-        print(f"Skipping, already in JSON: {name}")
-        return all_data[name]
+        existing = all_data[name]
+        # Overwrite if essential fields are missing/None
+        if existing.get("Total energy") is not None and existing.get("Total dipole moment") is not None:
+            # Entry is complete, skip processing
+            return existing
 
     # If name is NOT in JSON, proceed with reading the file
     with open(file_path, 'r') as f:
@@ -57,16 +63,15 @@ def extract_dipole_moments(name, file_path):
     m_en = re.search(mrchem_energy, content)
     o_en = re.search(orca_energy, content)
     m_dp = re.search(mrchem_dipole, content, re.DOTALL)
-    o_dp = re.search(orca_dipole, content)
-    
+    o_dp = re.search(orca_dipole, content, re.DOTALL)
     if m_en:
         results["Total energy"] = float(m_en.group(1))
-        results["Total dipole moment"] = float(m_dp.group(1))
+        results["Total dipole moment"] = float(m_dp.group(1)) if m_dp else None
         results["Precision"] = name_parts[-2]
         results["Software"] = "mrchem"
     elif o_en:
         results["Total energy"] = float(o_en.group(1))
-        results["Total dipole moment"] = float(o_dp.group(1))
+        results["Total dipole moment"] = float(o_dp.group(1)) if o_dp else None
         results["Basis set"] = name_parts[-1]
         results["Software"] = "orca"
     else:
@@ -97,4 +102,4 @@ for root, dirs, files in os.walk("functionals"):
             file_name = file.replace(".out", "")
             file_path = os.path.join(root, file)
 
-            extract_dipole_moments(file_name, file_path)
+            extract_properties(file_name, file_path)
