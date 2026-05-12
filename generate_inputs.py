@@ -2,7 +2,7 @@ import re
 import os
 from get_xyz import extract_geometry
 from mw_settings import calculate_energy_metrics
-
+from what_failed import check_orca_termination, check_mrchem_termination
 
 
 
@@ -286,42 +286,24 @@ def find_xyz_file(system):
         raise FileNotFoundError(f"No XYZ file found for system '{system}' in {geometries_dir}")
     return os.path.join(geometries_dir, matching_files[0])
 
-def check_orca_termination(file_path):
-    target = "****ORCA TERMINATED NORMALLY****"
-
-    with open(file_path, 'r') as f:
-        for line in f:
-            if target in line:
-                return True
-    return False
-
-def check_mrchem_termination(file_path):
-    target = "Exiting MRChem"
-
-    with open(file_path, 'r') as f:
-        for line in f:
-            if target in line:
-                return True
-    return False
-
-
 
 
 # Global
-functional = ["lda_x", "gga_x_b88"]
+functional = ["gga_x_pbe"]
 system     = ["BF", "BH", "C4H6"]
 geom_file  = [find_xyz_file(sys) for sys in system]
 
 # MRChem
-prec = "T2"
+prec = "T1"
 mw_params = [calculate_energy_metrics(sys, prec) for sys in system]
 e_abs, e_rel, order, e_conv, e_orb = zip(*mw_params)
 
 # Orca
-basis_set  = "cc-pVDZ"
+basis_set  = ["def2-SVP", "def2-TZVP", "def2-QZVP", "cc-pVDZ", "cc-pVTZ", "cc-pVQZ"]
 xc_type = "exchange" # functional, exchange or correlation
 
 for func in functional:
     for sys in range(len(system)):
         create_mrchem_input(geom_file[sys], system[sys], func, prec, e_rel[sys], order[sys], e_conv[sys], e_orb[sys])
-        create_orca_input(geom_file[sys], system[sys], func, basis_set, xc_type)
+        for basis in basis_set:
+            create_orca_input(geom_file[sys], system[sys], func, basis, xc_type)

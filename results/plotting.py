@@ -30,6 +30,7 @@ def plot_energy():
     cmap = plt.get_cmap('viridis')
     color_list = cmap(np.linspace(0, 0.9, len(functionals)))
     color_map = dict(zip(functionals, color_list))
+    markers = ['o', '^', 's', 'D', '>', 'p', '*', '<']
 
     # 3. Create Plot
     fig, axes = plt.subplots(len(molecules), 1, figsize=(10, 6 * len(molecules)), constrained_layout=True)
@@ -39,7 +40,7 @@ def plot_energy():
         # Filter for this molecule
         mol_df = df[df['Molecule'] == mol]
         
-        for func in functionals:
+        for m, func in enumerate(functionals):
             # Filter and sort by our numeric index
             func_df = mol_df[mol_df['Functional'] == func].sort_values('sort_idx')
             
@@ -49,7 +50,7 @@ def plot_energy():
                     func_df['sort_idx'], 
                     func_df['Total energy'], 
                     label=func,
-                    marker='o',
+                    marker=markers[m],
                     linestyle=':',
                     linewidth=2,
                     color=color_map[func],
@@ -100,6 +101,7 @@ def plot_dipole():
     cmap = plt.get_cmap('viridis')
     color_list = cmap(np.linspace(0, 0.9, len(functionals)))
     color_map = dict(zip(functionals, color_list))
+    markers = ['o', '^', 's', 'D', '>', 'p', '*', '<']
 
     # 3. Create Plot
     fig, axes = plt.subplots(len(molecules), 1, figsize=(10, 6 * len(molecules)), constrained_layout=True)
@@ -109,7 +111,7 @@ def plot_dipole():
         # Filter for this molecule
         mol_df = df[df['Molecule'] == mol]
         
-        for func in functionals:
+        for m, func in enumerate(functionals):
             # Filter and sort by our numeric index
             func_df = mol_df[mol_df['Functional'] == func].sort_values('sort_idx')
             
@@ -119,7 +121,7 @@ def plot_dipole():
                     func_df['sort_idx'], 
                     func_df['Total dipole moment'], 
                     label=func,
-                    marker='o',
+                    marker=markers[m],
                     linestyle=':',
                     linewidth=2,
                     color=color_map[func],
@@ -163,6 +165,7 @@ def plot_e_diff():
     
     cmap = plt.get_cmap('viridis') # Changed color map for variety
     color_map = dict(zip(functionals, cmap(np.linspace(0, 1, len(functionals)))))
+    markers = ['o', '^', 's', 'D', '>', 'p', '*', '<']
     
     Tn = "T1" # Reference
 
@@ -179,7 +182,7 @@ def plot_e_diff():
         for i, mol in enumerate(molecules):
             mol_df = df[df['Molecule'] == mol]
             
-            for func in functionals:
+            for m, func in enumerate(functionals):
                 func_all = mol_df[mol_df['Functional'] == func]
                 tn_match = func_all[func_all['Basis_or_Precision'].str.strip() == Tn]
                 
@@ -199,13 +202,13 @@ def plot_e_diff():
                             plot_df['sort_idx'], 
                             y_values, 
                             label=func,
-                            marker='o' if p_info["type"] == "absolute" else 's',
+                            marker=markers[m] if p_info["type"] == "absolute" else 's',
                             color=color_map[func]
                         )
 
             # Formatting
             title_prefix = "Absolute" if p_info["type"] == "absolute" else "Relative"
-            axes[i].set_title(f'{title_prefix} Energy: {mol}', fontsize=14, fontweight='bold')
+            axes[i].set_title(f'{title_prefix} Energy Error: {mol}', fontsize=14, fontweight='bold')
             axes[i].set_ylabel(p_info["label"])
             axes[i].set_xticks(range(len(custom_order)))
             axes[i].set_xticklabels(custom_order)
@@ -237,6 +240,7 @@ def plot_dp_diff():
     
     cmap = plt.get_cmap('viridis') # Changed color map for variety
     color_map = dict(zip(functionals, cmap(np.linspace(0, 1, len(functionals)))))
+    markers = ['o', '^', 's', 'D', '>', 'p', '*', '<']
     
     Tn = "T1" # Reference
 
@@ -253,7 +257,7 @@ def plot_dp_diff():
         for i, mol in enumerate(molecules):
             mol_df = df[df['Molecule'] == mol]
             
-            for func in functionals:
+            for m, func in enumerate(functionals):
                 func_all = mol_df[mol_df['Functional'] == func]
                 tn_match = func_all[func_all['Basis_or_Precision'].str.strip() == Tn]
                 
@@ -274,7 +278,7 @@ def plot_dp_diff():
                                 plot_df['sort_idx'], 
                                 y_values, 
                                 label=func,
-                                marker='o' if p_info["type"] == "absolute" else 's',
+                                marker=markers[m] if p_info["type"] == "absolute" else 's',
                                 color=color_map[func]
                             )
                         else:
@@ -282,7 +286,7 @@ def plot_dp_diff():
 
             # Formatting
             title_prefix = "Absolute" if p_info["type"] == "absolute" else "Relative"
-            axes[i].set_title(f'{title_prefix} Dipole Moment: {mol}', fontsize=14, fontweight='bold')
+            axes[i].set_title(f'{title_prefix} Error Dipole Moment: {mol}', fontsize=14, fontweight='bold')
             axes[i].set_ylabel(p_info["label"])
             axes[i].set_xticks(range(len(custom_order)))
             axes[i].set_xticklabels(custom_order)

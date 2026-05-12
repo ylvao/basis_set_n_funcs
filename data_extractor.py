@@ -3,6 +3,8 @@ import re
 import json
 from pathlib import Path
 
+warnings = []
+
 def extract_properties(name, file_path):
 
     json_file = Path("results/data.json")
@@ -39,16 +41,13 @@ def extract_properties(name, file_path):
     name_parts = name.split('_')
     molecule = name_parts[0] if len(name_parts) > 0 else "Unknown"
 
-    # Check if the name ends with the numerical ID (like 2e05)
-    # If the last part contains a digit, we treat it as an ID 
-    # and the functional ends earlier
-    if any(char.isdigit() for char in name_parts[-1]) and len(name_parts) > 4:
-        # Format: BH_gga_x_b88_T1_2e05
-        precision = name_parts[-2]
-        functional = "_".join(name_parts[1:-2])
+    t_index = next((i for i, s in enumerate(name_parts) if re.fullmatch(r'T[1-4]', s)), None)
+
+    if t_index is not None:
+        # If a T tier is found, everything between the molecule and the T tier is the functional
+        functional = "_".join(name_parts[1:t_index])
     else:
-        # Format: BF_lda_x_ccpvqz or BH_gga_c_N12_ccpvqz
-        precision = name_parts[-1]
+        # Standard format: Molecule_Functional_Basis
         functional = "_".join(name_parts[1:-1])
 
 
@@ -75,14 +74,14 @@ def extract_properties(name, file_path):
         results["Basis set"] = name_parts[-1]
         results["Software"] = "orca"
     else:
-        print(f"Warning: No dipole magnitude or energyfound in {name}")
+        warnings.append(f"Warning: No dipole magnitude or energyfound in {name}")
 
-    if Path(json_file).exists():
-        try:
-            with open(json_file, 'r') as f:
+    # if Path(json_file).exists():
+    try:
+        with open(json_file, 'r') as f:
                 all_data = json.load(f)
-        except json.JSONDecodeError:
-            all_data = {}
+    except json.JSONDecodeError:
+        all_data = {}
 
     all_data[name] = results
 
@@ -90,7 +89,6 @@ def extract_properties(name, file_path):
         json.dump(all_data, f, indent=4)
 
     print(f"Data extracted from {name}")
-
 
 exclude = {"out"}
 
@@ -103,3 +101,5 @@ for root, dirs, files in os.walk("functionals"):
             file_path = os.path.join(root, file)
 
             extract_properties(file_name, file_path)
+for w in warnings:
+    print(w)
