@@ -7,13 +7,18 @@ from what_failed import check_orca_termination, check_mrchem_termination
 
 
 def create_mrchem_runner(molecule_name, functional, e_rel, Tn):
-    filename = f"runners/{molecule_name}_{functional}_{Tn}_{e_rel}.sh"
+    file_name = f"{molecule_name}_{functional}_{Tn}_{e_rel}"
+    input_file = f"functionals/{functional}/{molecule_name}/inp/{file_name}.inp"
+    output_file = f"functionals/{functional}/{molecule_name}/out/{file_name}.out"
+    
+    runner_path = f"runners/{file_name}.sh"
 
-    if os.path.exists(f"functionals/{functional}/{molecule_name}/{molecule_name}_{functional}_{Tn}_{e_rel}.out"):
-        if check_orca_termination(f"functionals/{functional}/{molecule_name}/{molecule_name}_{functional}_{Tn}_{e_rel}.out"):
-            return print(f"Outfile already exists for: {molecule_name}_{functional}_{Tn}_{e_rel}")
-    if os.path.exists(filename):
-        return print(f"Runner file already exists for: {molecule_name}_{functional}_{Tn}_{e_rel}")
+    if os.path.exists(output_file):
+        if check_mrchem_termination(output_file):
+            return print(f"Outfile already exists for: {file_name}")
+    if os.path.exists(runner_path):
+        return print(f"Runner file already exists for: {file_name}")
+
     template_str = """#!/bin/bash
 
 cd ..
@@ -40,7 +45,7 @@ sbatch "$abs/mrchem_runner.sh" "$abs_dir" "$name"
     file_content = file_content.replace("param_prec", e_rel)
     file_content = file_content.replace("param_t", Tn)
 
-    with open(filename, 'w') as f:
+    with open(file_name, 'w') as f:
         f.write(file_content)
 
 def create_mrchem_input(geometry, molecule_name, functional, Tn, e_rel, order, e_conv, e_orb):
@@ -51,14 +56,18 @@ def create_mrchem_input(geometry, molecule_name, functional, Tn, e_rel, order, e
     
     # Create output directory and file
     input_dir = f"functionals/{functional}/{molecule_name}/inp"
+    output_dir = f"functionals/{functional}/{molecule_name}/out"
+
     filename_prec = str(e_rel).replace("-", "")
-    output_file = f"{input_dir}/{molecule_name}_{functional}_{Tn}_{filename_prec}.inp"
+    name_core = f"{molecule_name}_{functional}_{Tn}_{filename_prec}"
+    input_file = f"{input_dir}/{name_core}.inp"
+    output_file = f"{output_dir}/{name_core}.out"
 
     create_mrchem_runner(molecule_name, functional, filename_prec, Tn)
-    if os.path.exists(f"functionals/{functional}/{molecule_name}/inp/{molecule_name}_{functional}_{Tn}_{filename_prec}.inp"):
-        if os.path.exists(f"functionals/{functional}/{molecule_name}/inp/{molecule_name}_{functional}_{Tn}_{filename_prec}.out"):
-            if check_orca_termination(f"functionals/{functional}/{molecule_name}/{molecule_name}_{functional}_{Tn}_{e_rel}.out"):
-                return print(f"Inpfile  already exists for: {molecule_name}_{functional}_{Tn}_{e_rel}")
+    if os.path.exists(input_file):
+        if os.path.exists(output_file):
+            if check_mrchem_termination(output_file):
+                return print(f"Inpfile  already exists for: {name_core}")
 
     template_str = """# vim:syntax=sh:
 
@@ -144,20 +153,25 @@ SCF {
         file_content = file_content.replace("param_eorb", str(e_orb))
 
         os.makedirs(input_dir, exist_ok=True)
-        os.makedirs(f"functionals/{functional}/{molecule_name}/out", exist_ok=True)
-        with open(output_file, 'w') as f:
+        os.makedirs(output_dir, exist_ok=True)
+        with open(input_file, 'w') as f:
             f.write(file_content)
 
-    print(f"\nNew!\nMRChem input file created for: {molecule_name}_{functional}_{Tn}_{e_rel}\n")
+    print(f"\nNew!\nMRChem input file created for: {name_core}\n")
 
 def create_orca_runner(molecule_name, functional, basis_set):
-    filename = f"runners/{molecule_name}_{functional}_{basis_set}.sh"
 
-    if os.path.exists(f"functionals/{functional}/{molecule_name}/{molecule_name}_{functional}_{basis_set}.out"):
-        if check_orca_termination(f"functionals/{functional}/{molecule_name}/{molecule_name}_{functional}_{basis_set}.out"):
-            return print(f"Outfile already exists for: {molecule_name}_{functional}_{basis_set}")
-    if os.path.exists(filename):
-        return print(f"Runner file already exists for: {molecule_name}_{functional}_{basis_set}")
+    file_name = f"{molecule_name}_{functional}_{basis_set}"
+    input_file = f"functionals/{functional}/{molecule_name}/inp/{file_name}.inp"
+    output_file = f"functionals/{functional}/{molecule_name}/out/{file_name}.out"
+    
+    runner_path = f"runners/{file_name}.sh"
+
+    if os.path.exists(output_file):
+        if check_orca_termination(output_file):
+            return print(f"Outfile already exists for: {file_name}")
+    if os.path.exists(runner_path):
+        return print(f"Runner file already exists for: {file_name}")
 
     template_str = """#!/bin/bash
 
@@ -181,7 +195,7 @@ sbatch "$script_dir/orca_runner.sh" "$abs_dir" "$name"
     file_content = file_content.replace("param_func", functional)
     file_content = file_content.replace("param_mol", molecule_name)
 
-    with open(filename, 'w') as f:
+    with open(file_name, 'w') as f:
         f.write(file_content)
 
 
@@ -190,16 +204,20 @@ def create_orca_input(geometry, molecule_name, functional, basis_set, xc_type):
     Parses an XYZ file and creates an ORCA input file
     for the molecule using a provided template.
     """
-
+    # Create output directory and file
     input_dir = f"functionals/{functional}/{molecule_name}/inp"
+    output_dir = f"functionals/{functional}/{molecule_name}/out"
+
     basis_set_format = basis_set.lower().replace("-", "")
-    output_file = f"{input_dir}/{molecule_name}_{functional}_{basis_set_format}.inp"
+    name_core = f"{molecule_name}_{functional}_{basis_set_format}"
+    input_file = f"{input_dir}/{name_core}.inp"
+    output_file = f"{output_dir}/{name_core}.out"
 
     create_orca_runner(molecule_name, functional, basis_set_format)
-    if os.path.exists(f"functionals/{functional}/{molecule_name}/inp/{molecule_name}_{functional}_{basis_set_format}.inp"):
-        if os.path.exists(f"functionals/{functional}/{molecule_name}/inp/{molecule_name}_{functional}_{basis_set_format}.out"):
-            if check_orca_termination(f"functionals/{functional}/{molecule_name}/{molecule_name}_{functional}_{basis_set}.out"):
-                return print(f"Inpfile  already exists for: {molecule_name}_{functional}_{basis_set}")
+    if os.path.exists(input_file):
+        if os.path.exists(output_file):
+            if check_orca_termination(output_file):
+                return print(f"Inpfile  already exists for: {name_core}")
 
     template_str = """! dft param_basis TightSCF
 %pal nprocs 8 end
@@ -261,11 +279,11 @@ param_xyz
         file_content = file_content.replace("param_xctype", xc_type)
 
         os.makedirs(input_dir, exist_ok=True)
-        os.makedirs(f"functionals/{functional}/{molecule_name}/out", exist_ok=True)
+        os.makedirs(output_dir, exist_ok=True)
         with open(output_file, 'w') as f:
             f.write(file_content)
 
-    print(f"\nNEW!\nOrca input file created for: {molecule_name}_{functional}_{basis_set_format}\n")
+    print(f"\nNEW!\nOrca input file created for: {file_name}\n")
 
 
 def find_xyz_file(system):

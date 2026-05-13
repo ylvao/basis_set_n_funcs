@@ -1,0 +1,18 @@
+#!/bin/bash
+
+cd ..
+
+# Calc parameters
+mol="C4H6"
+func="gga_x_pbe"
+t="T1"
+prec="3e06"
+
+abs="/cluster/projects/nn14654k/ylvaos/basis_set_n_funcs"
+dir="functionals/$func/$mol"
+name="${mol}_${func}_${t}_${prec}"
+
+abs_dir="$abs/$dir"
+cd "$abs_dir/out" || exit 1
+sbatch "$abs/mrchem_runner.sh" "$abs_dir" "$name"
+
