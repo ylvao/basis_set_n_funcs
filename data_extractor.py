@@ -24,7 +24,7 @@ def extract_properties(name, file_path):
     if name in all_data:
         existing = all_data[name]
         # Overwrite if essential fields are missing/None
-        if existing.get("Total energy") is not None and existing.get("Total dipole moment") is not None:
+        if existing.get("Total energy") is not None and existing.get("Total dipole moment") is not None and existing.get("Quadrupole moment", {}).get("XX") is not None:
             # Entry is complete, skip processing
             return existing
 
@@ -73,9 +73,11 @@ def extract_properties(name, file_path):
     o_qp = re.search(orca_qupole, content, re.DOTALL)
     if m_en:
         results["Total energy"] = float(m_en.group(1))
-        results["Total dipole moment"] = float(m_dp.group(1)) if m_dp else None
-        if results["Total dipole moment"] == "N/A":
-            results["Total dipole moment"] = 0
+        dp_temp = m_dp.group(1) if m_dp else None
+        if dp_temp == "N/A":
+            results["Total dipole moment"] = 0.0
+        else:
+            results["Total dipole moment"] = float(m_dp.group(1))
         results["Quadrupole moment"]["XX"] = float(m_qp.group(1)) if m_qp else None
         results["Quadrupole moment"]["XY"] = float(m_qp.group(2)) if m_qp else None
         results["Quadrupole moment"]["XZ"] = float(m_qp.group(3)) if m_qp else None

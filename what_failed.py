@@ -1,4 +1,5 @@
 import os
+import re
 
 def check_orca_termination(file_path):
     target = "****ORCA TERMINATED NORMALLY****"
@@ -10,13 +11,10 @@ def check_orca_termination(file_path):
     return False
 
 def check_mrchem_termination(file_path):
-    target = "Exiting MRChem"
-
+    pattern = re.compile(r'(?s)(?=.*Exiting MRChem)(?=.*SCF converged in )')
     with open(file_path, 'r') as f:
-        for line in f:
-            if target in line:
-                return True
-    return False
+        text = f.read()
+    return bool(pattern.search(text))
 
 def inp_missing_out(file_name):
     folder_to_exclude = "out"    # The name of the folder to skip
