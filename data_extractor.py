@@ -32,10 +32,12 @@ def extract_properties(name, file_path):
     with open(file_path, 'r') as f:
         content = f.read()
 
-    mrchem_dipole = r"Total\s+vector\s+:.*?\n\s+Magnitude\s+:\s+\(au\)\s+([\d\.\-]+)"
+    mrchem_dipole = r"Total\s+vector\s+:.*?\n\s+Magnitude\s+:\s+\(au\)\s+([\d\.\-,N\/A]+)"
+    mrchem_qupole = r"Total tensor\s+:\s+(-?\d+.\d+)\s+(-?\d+.\d+)\s+(-?\d+.\d+)\s+:\s+-?\d+.\d+\s+(-?\d+.\d+)\s+(-?\d+.\d+)\s+:\s+-?\d+.\d+\s+-?\d+.\d+\s+(-?\d+.\d+)"
     mrchem_energy = r"Total energy\s+:\s+\(au\)\s+([\d\.\-\+eE]+)"
     
     orca_dipole = r"Magnitude \(a\.u\.\)\s+:\s+([\d\.\-]+)"
+    orca_qupole = r"TOT\s+(-?\d+.\d+)\s+(-?\d+.\d+)\s+(-?\d+.\d+)\s+(-?\d+.\d+)\s+(-?\d+.\d+)\s+(-?\d+.\d+)"
     orca_energy = r"FINAL SINGLE POINT ENERGY\s+([\d\.\-]+)"
 
     name_parts = name.split('_')
@@ -56,25 +58,45 @@ def extract_properties(name, file_path):
         "Functional": functional,
         "Molecule": molecule,
         "Total dipole moment": None,
+        "Quadrupole moment": {
+            "XX": None, "XY": None, "XZ": None,
+            "YY": None, "YZ" : None, "ZZ": None
+        },
         "Total energy": None
         }
 
     m_en = re.search(mrchem_energy, content)
     o_en = re.search(orca_energy, content)
     m_dp = re.search(mrchem_dipole, content, re.DOTALL)
+    m_qp = re.search(mrchem_qupole, content, re.DOTALL)
     o_dp = re.search(orca_dipole, content, re.DOTALL)
+    o_qp = re.search(orca_qupole, content, re.DOTALL)
     if m_en:
         results["Total energy"] = float(m_en.group(1))
         results["Total dipole moment"] = float(m_dp.group(1)) if m_dp else None
+        if results["Total dipole moment"] == "N/A":
+            results["Total dipole moment"] = 0
+        results["Quadrupole moment"]["XX"] = float(m_qp.group(1)) if m_qp else None
+        results["Quadrupole moment"]["XY"] = float(m_qp.group(2)) if m_qp else None
+        results["Quadrupole moment"]["XZ"] = float(m_qp.group(3)) if m_qp else None
+        results["Quadrupole moment"]["YY"] = float(m_qp.group(4)) if m_qp else None
+        results["Quadrupole moment"]["YZ"] = float(m_qp.group(5)) if m_qp else None
+        results["Quadrupole moment"]["ZZ"] = float(m_qp.group(6)) if m_qp else None
         results["Precision"] = name_parts[-2]
         results["Software"] = "mrchem"
     elif o_en:
         results["Total energy"] = float(o_en.group(1))
         results["Total dipole moment"] = float(o_dp.group(1)) if o_dp else None
+        results["Quadrupole moment"]["XX"] = float(o_qp.group(1)) if o_qp else None
+        results["Quadrupole moment"]["YY"] = float(o_qp.group(2)) if o_qp else None
+        results["Quadrupole moment"]["ZZ"] = float(o_qp.group(3)) if o_qp else None
+        results["Quadrupole moment"]["XY"] = float(o_qp.group(4)) if o_qp else None
+        results["Quadrupole moment"]["XZ"] = float(o_qp.group(5)) if o_qp else None
+        results["Quadrupole moment"]["YZ"] = float(o_qp.group(6)) if o_qp else None
         results["Basis set"] = name_parts[-1]
         results["Software"] = "orca"
     else:
-        warnings.append(f"Warning: No dipole magnitude or energyfound in {name}")
+        warnings.append(f"Warning: nergies found in {name}")
 
     # if Path(json_file).exists():
     try:

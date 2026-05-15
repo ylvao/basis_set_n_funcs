@@ -4,6 +4,13 @@ import json
 import os
 import numpy as np
 
+def qupole_error(mol1, mol2):
+    components = ('XX', 'XY', 'XZ', 'YY', 'YZ', 'ZZ')
+    q1 = mol1['Quadrupole moment']
+    q2 = mol2['Quadrupole moment']
+    diff = np.array([q1.get(k) - q2.get(k) for k in components], dtype=float)
+    return float(np.dot(diff, diff))
+
 def load_and_prep_data(filepath):
     with open(filepath, 'r') as f:
         data = json.load(f)
@@ -12,18 +19,20 @@ def load_and_prep_data(filepath):
     return df
 
 def generate_plot(df, metric, title_prefix, ylabel, filename, 
-                  custom_order=['T1', 'T2', 'ccpvdz', 'ccpvtz', 'ccpvqz', 'def2svp', 'def2dzvp', 'def2tzvp', 'def2tzvp'], 
-                  ref_col=None, relative=False):
+                  custom_order=['T1', 'T2', 'ccpvdz', 'ccpvtz', 'ccpvqz', 'augccpvdz', 'augccpvtz', 'augccpvqz', 'def2svp', 'def2tzvp', 'def2tzvp'], 
+                  ref_col=None, relative=False, func_names=None):
     """Generic engine to plot absolute values or differences."""
     
     molecules = df['Molecule'].unique()
-    functionals = sorted(df['Functional'].unique())
+    if func_names == None:
+        functionals = sorted(df['Functional'].unique())
+    else:
+        functionals = func_names
     order_map = {val: i for i, val in enumerate(custom_order)}
     
-    # Styling
     cmap = plt.get_cmap('viridis')
     color_map = dict(zip(functionals, cmap(np.linspace(0, 0.9, len(functionals)))))
-    markers = ['o', '^', 's', 'D', '>', 'p', '*', '<']
+    markers = ['o', '^', 's', 'D', '>', 'p', '*', '<', 'o', '^', 's', 'D', '>', 'p', '*', '<']
 
     fig, axes = plt.subplots(len(molecules), 1, figsize=(10, 6 * len(molecules)), constrained_layout=True)
     if len(molecules) == 1: axes = [axes]
@@ -74,16 +83,15 @@ def generate_plot(df, metric, title_prefix, ylabel, filename,
     plt.close()
     print(f"Saved: {filename}")
 
-# --- Main Execution ---
 
 data_df = load_and_prep_data('results/data.json')
 
-# 1. Standard Plots
+# Standard Plots
 generate_plot(data_df, 'Total energy', 'Energy Comparison', 'Energy (Hartree)', 'energy_overlay.png')
 generate_plot(data_df, 'Total dipole moment', 'Dipole Comparison', 'Dipole (a.u.)', 'dipole_overlay.png')
 
-# 2. Difference Plots (Relative to T1)
-diff_sets = ['ccpvdz', 'ccpvtz', 'ccpvqz']
+# Difference Plots (Relative to MRChem)
+diff_sets = ['ccpvdz', 'ccpvtz', 'ccpvqz', 'augccpvdz', 'augccpvtz', 'augccpvqz', 'def2svp', 'def2tzvp', 'def2tzvp']
 
 # Energy Diffs
 generate_plot(data_df, 'Total energy', 'Abs Energy Error', '$\Delta E$ (a.u.)', 
@@ -92,7 +100,55 @@ generate_plot(data_df, 'Total energy', 'Rel Energy Error', 'Rel $\Delta E$',
               'energy_rel_T1.png', custom_order=diff_sets, ref_col='T1', relative=True)
 
 # Dipole Diffs
-generate_plot(data_df, 'Total dipole moment', 'Abs Dipole Error', '$\Delta \mu$ (a.u.)', 
+generate_plot(data_df, 'Total dipole moment', 'Abs Dipole Error', '$\Delta \mu$ (a.u.)',
               'dipole_abs_T1.png', custom_order=diff_sets, ref_col='T1')
-generate_plot(data_df, 'Total dipole moment', 'Rel Dipole Error', 'Rel $\Delta \mu$', 
+generate_plot(data_df, 'Total dipole moment', 'Rel Dipole Error', 'Rel $\Delta \mu$',
               'dipole_rel_T1.png', custom_order=diff_sets, ref_col='T1', relative=True)
+
+
+# Make separate plot for all Functionals
+functionals = sorted(data_df['Functional'].unique())
+for func in functionals:
+    func_dir = f"functionals/{func}"
+    os.makedirs(f"results/plots/{func_dir}", exist_ok=True)
+    generate_plot(data_df, 'Total energy', 'Energy Comparison', 'Energy (Hartree)',
+                  f'{func_dir}/energy_overlay_{func}.png', func_names=[func])
+    generate_plot(data_df, 'Total dipole moment', 'Dipole Comparison', 'Dipole (a.u.)',
+                  f'{func_dir}/dipole_overlay_{func}.png', func_names=[func])
+
+    # Difference Plots (Relative to T1)
+    diff_sets = ['ccpvdz', 'ccpvtz', 'ccpvqz', 'augccpvdz', 'augccpvtz', 'augccpvqz', 'def2svp', 'def2tzvp', 'def2tzvp']
+
+    generate_plot(data_df, 'Total energy', 'Abs Energy Error', '$\Delta E$ (a.u.)', 
+                f'{func_dir}/energy_abs_T1_{func}.png', custom_order=diff_sets, ref_col='T1', func_names=[func])
+    generate_plot(data_df, 'Total energy', 'Rel Energy Error', 'Rel $\Delta E$', 
+                f'{func_dir}/energy_rel_T1_{func}.png', custom_order=diff_sets, ref_col='T1', relative=True, func_names=[func])
+    generate_plot(data_df, 'Total dipole moment', 'Abs Dipole Error', '$\Delta \mu$ (a.u.)',
+                f'{func_dir}/dipole_abs_T1_{func}.png', custom_order=diff_sets, ref_col='T1', func_names=[func])
+    generate_plot(data_df, 'Total dipole moment', 'Rel Dipole Error', 'Rel $\Delta \mu$',
+                f'{func_dir}/dipole_rel_T1_{func}.png', custom_order=diff_sets, ref_col='T1', relative=True, func_names=[func])
+
+# Make separate plot for all basis set families
+basis_set_fams = {
+    'cc':    ['ccpvdz', 'ccpvtz', 'ccpvqz'],
+    'augcc': ['augccpvdz', 'augccpvtz', 'augccpvqz'],
+    'def2':  ['def2svp', 'def2tzvp', 'def2tzvp'],
+    'pcseg': ["pcseg0", "pcseg2", "pcseg4"],
+    'pc':    ["pc0", "pc2", "pc4"],
+}
+
+for fam, list in basis_set_fams.items():
+    basis_dir = f"basis/{fam}"
+    os.makedirs(f"results/plots/{basis_dir}", exist_ok=True)
+    generate_plot(data_df, 'Total energy', 'Energy Comparison', 'Energy (Hartree)',
+                f'{basis_dir}/energy_overlay_{fam}.png', custom_order=list)
+    generate_plot(data_df, 'Total dipole moment', 'Dipole Comparison', 'Dipole (a.u.)',
+                f'{basis_dir}/dipole_overlay_{fam}.png', custom_order=list)
+    generate_plot(data_df, 'Total energy', 'Abs Energy Error', '$\Delta E$ (a.u.)', 
+                f'{basis_dir}/energy_abs_T1_{fam}.png', custom_order=list, ref_col='T1')
+    generate_plot(data_df, 'Total energy', 'Rel Energy Error', 'Rel $\Delta E$', 
+                f'{basis_dir}/energy_rel_T1_{fam}.png', custom_order=list, ref_col='T1', relative=True)
+    generate_plot(data_df, 'Total dipole moment', 'Abs Dipole Error', '$\Delta \mu$ (a.u.)',
+                f'{basis_dir}/dipole_abs_T1_{fam}.png', custom_order=list, ref_col='T1')
+    generate_plot(data_df, 'Total dipole moment', 'Rel Dipole Error', 'Rel $\Delta \mu$',
+                f'{basis_dir}/dipole_rel_T1_{fam}.png', custom_order=list, ref_col='T1', relative=True)

@@ -3,9 +3,9 @@
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Calc parameters
-mol="C4H6"
+mol="BF"
 func="gga_c_N12"
-basis="ccpvdz"
+basis="ccpvtz"
 #
 
 dir="functionals/$func/$mol"

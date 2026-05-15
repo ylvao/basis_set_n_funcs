@@ -1,15 +1,16 @@
 #!/bin/sh
 #SBATCH --account=nn14654k
-#SBATCH --partition=large
+#SBATCH --partition=small
 #SBATCH --output=%j.out
 #SBATCH --error=%j.err
 
 
 #SBATCH --job-name=orca_func_tester
-#SBATCH --time=0-10:00:00
-#SBATCH --nodes=8
-#SBATCH --ntasks-per-node=256
+#SBATCH --time=0-1:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=8
 #SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=3G
 export OMP_NUM_THREADS=1
 
 #Modules

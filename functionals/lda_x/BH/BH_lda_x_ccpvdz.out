@@ -171,16 +171,18 @@ interface, adapt or use parts of their codes:
 
 
   ***********************************
-  * Starting time: Mon May 11 16:39:19 2026
-  * Host name:     c1-199
-  * Process ID:    2835241
+  * Starting time: Fri May 15 14:01:53 2026
+  * Host name:     c1-39
+  * Process ID:    1087394
   * Working dir.:  /cluster/projects/nn14654k/ylvaos/basis_set_n_funcs/functionals/lda_x/BH/out
   ***********************************
 
-Using LibXC functional ID   9 : Perdew & Zunger
-[ 1]  J. P. Perdew and A. Zunger.,  Phys. Rev. B 23, 5048 (1981)
-Using LibXC functional ID   9 : Perdew & Zunger
-[ 1]  J. P. Perdew and A. Zunger.,  Phys. Rev. B 23, 5048 (1981)
+Using LibXC functional ID   1 : Slater exchange
+[ 1]  P. A. M. Dirac.,  Math. Proc. Cambridge Philos. Soc. 26, 376 (1930)
+[ 2]  F. Bloch.,  Z. Phys. 57, 545 (1929)
+Using LibXC functional ID   1 : Slater exchange
+[ 1]  P. A. M. Dirac.,  Math. Proc. Cambridge Philos. Soc. 26, 376 (1930)
+[ 2]  F. Bloch.,  Z. Phys. 57, 545 (1929)
 Your calculation utilizes LibXC
 by S. Lehtola, C. Steigemann, M. J. T. Oliveira & M. A. L. Marques
 Please cite in your paper:
@@ -226,20 +228,22 @@ NAME = /cluster/projects/nn14654k/ylvaos/basis_set_n_funcs/functionals/lda_x/BH/
 |  7> end
 |  8> 
 |  9> %method
-| 10>   correlation lda_x
-| 11> end
-| 12> 
-| 13> %elprop
-| 14>   Dipole true
-| 15> end
-| 16> 
-| 17> * xyz 0 1
-| 18> H    0.000000000000   0.000000000000  -0.616000000000
-| 19> B    0.000000000000   0.000000000000   0.616000000000
-| 20> *
-| 21> 
-| 22> 
-| 23>                          ****END OF INPUT****
+| 10>   exchange lda_x
+| 11>   correlation None
+| 12> end
+| 13> 
+| 14> %elprop
+| 15>   Dipole true
+| 16>   Quadrupole true
+| 17> end
+| 18> 
+| 19> * xyz 0 1
+| 20> H    0.000000000000   0.000000000000  -0.616000000000
+| 21> B    0.000000000000   0.000000000000   0.616000000000
+| 22> *
+| 23> 
+| 24> 
+| 25>                          ****END OF INPUT****
 ================================================================================
 
                        ****************************
@@ -411,10 +415,10 @@ Total number of grid points                  ...    15685
 Total number of batches                      ...      246
 Average number of points per batch           ...       63
 Average number of grid points per atom       ...     7842
-Grids setup in   0.3 sec
+Grids setup in   0.1 sec
 Initializing property integral containers    ... done (  0.0 sec)
 
-SHARK setup successfully completed in   0.9 seconds
+SHARK setup successfully completed in   0.2 seconds
 
 Maximum memory used throughout the entire STARTUP-calculation: 11.3 MB
 
@@ -433,28 +437,14 @@ SCF SETTINGS
 ------------
 Hamiltonian:
  Density Functional     Method          .... DFT(GTOs)
- Exchange Functional    Exchange        .... Slater
-   X-Alpha parameter    XAlpha          ....  0.666667
-  Functional kind                       .... Correlation
-  Functional name                       .... Perdew & Zunger
+  Functional kind                       .... Exchange
+  Functional name                       .... Slater exchange
   Functional family                     .... LDA
   Functional refs                              
-    [ 0] J. P. Perdew and A. Zunger.,  Phys. Rev. B 23, 5048 (1981), doi: 10.1103/PhysRevB.23.5048
-  Functional external parameters        .... 14
-    Parameter  0 _gamma0    = -1.423000e-01 : gamma0 parameter    
-    Parameter  1 _gamma1    = -8.430000e-02 : gamma1 parameter    
-    Parameter  2 _beta10    =  1.052900e+00 : beta10 parameter    
-    Parameter  3 _beta11    =  1.398100e+00 : beta11 parameter    
-    Parameter  4 _beta20    =  3.334000e-01 : beta20 parameter    
-    Parameter  5 _beta21    =  2.611000e-01 : beta21 parameter    
-    Parameter  6 _a0        =  3.110000e-02 : a0 parameter        
-    Parameter  7 _a1        =  1.555000e-02 : a1 parameter        
-    Parameter  8 _b0        = -4.800000e-02 : b0 parameter        
-    Parameter  9 _b1        = -2.690000e-02 : b1 parameter        
-    Parameter 10 _c0        =  2.000000e-03 : c0 parameter        
-    Parameter 11 _c1        =  7.000000e-04 : c1 parameter        
-    Parameter 12 _d0        = -1.160000e-02 : d0 parameter        
-    Parameter 13 _d1        = -4.800000e-03 : d1 parameter        
+    [ 0] P. A. M. Dirac.,  Math. Proc. Cambridge Philos. Soc. 26, 376 (1930), doi: 10.1017/S0305004100016108
+    [ 1] F. Bloch.,  Z. Phys. 57, 545 (1929), doi: 10.1007/BF01340281
+  Functional external parameters        .... 0
+ Correlation Functional Correlation     .... No Correlation
  Gradients option       PostSCFGGA      .... off
 
 
@@ -536,24 +526,24 @@ Loading Hartree-Fock densities                     ... done
 Calculating cut-offs                               ... done
 Initializing the effective Hamiltonian             ... done
 Setting up the integral package (SHARK)            ... done
-Starting the Coulomb interaction                   ... done (   0.2 sec)
+Starting the Coulomb interaction                   ... done (   0.0 sec)
 Making the grid                                    ... done (   0.0 sec)
 Mapping shells                                     ... done
 Starting the XC term evaluation                    ... done (   0.0 sec)
   promolecular density results
      # of electrons  =      5.999818727
      EX              =     -3.517127919
-     EC              =     -0.342362325
-     EX+EC           =     -3.859490244
+     EC              =      0.000000000
+     EX+EC           =     -3.517127919
 Transforming the Hamiltonian                       ... done (   0.0 sec)
 Diagonalizing the Hamiltonian                      ... done (   0.0 sec)
 Back transforming the eigenvectors                 ... done (   0.0 sec)
 Now organizing SCF variables                       ... done
                       ------------------
-                      INITIAL GUESS DONE (   0.2 sec)
+                      INITIAL GUESS DONE (   0.0 sec)
                       ------------------
              **** ENERGY FILE WAS UPDATED (/cluster/projects/nn14654k/ylvaos/basis_set_n_funcs/functionals/lda_x/BH/inp/BH_lda_x_ccpvdz.en.tmp) ****
-Finished Guess after   0.4 sec
+Finished Guess after   0.1 sec
 Maximum memory used throughout the entire GUESS-calculation: 3.5 MB
 
 
@@ -571,23 +561,23 @@ Maximum memory used throughout the entire GUESS-calculation: 3.5 MB
 Iteration    Energy (Eh)           Delta-E    RMSDP     MaxDP     DIISErr   Damp  Time(sec)
 -------------------------------------------------------------------------------------------
                ***  Starting incremental Fock matrix formation  ***
-    1    -24.9608670408732820     0.00e+00  1.02e-02  3.24e-02  5.59e-02  0.700   0.2
-Warning: op=0 Small HOMO/LUMO gap (   0.061) - skipping pre-diagonalization
+    1    -24.6124929070951737     0.00e+00  1.01e-02  3.12e-02  5.97e-02  0.700   0.0
+Warning: op=0 Small HOMO/LUMO gap (   0.057) - skipping pre-diagonalization
          Will do a full diagonalization
-    2    -24.9624799500199046    -1.61e-03  1.19e-02  4.01e-02  4.06e-02  0.700   0.0
+    2    -24.6140885492322248    -1.60e-03  1.23e-02  4.12e-02  4.32e-02  0.700   0.1
                                ***Turning on AO-DIIS***
-    3    -24.9635692535456002    -1.09e-03  6.80e-03  2.14e-02  2.63e-02  0.700   0.1
-    4    -24.9642538374109613    -6.85e-04  1.42e-02  4.27e-02  1.77e-02  0.000   0.0
+    3    -24.6151752791018446    -1.09e-03  7.41e-03  2.32e-02  2.79e-02  0.700   0.1
+    4    -24.6158615340424305    -6.86e-04  1.57e-02  4.72e-02  1.88e-02  0.000   0.1
                               *** Initializing SOSCF ***
 ---------------------------------------S-O-S-C-F--------------------------------------
 Iteration    Energy (Eh)           Delta-E    RMSDP     MaxDP     MaxGrad    Time(sec)
 --------------------------------------------------------------------------------------
-    5    -24.9656936111204679    -1.44e-03  3.90e-04  1.24e-03  7.99e-04     0.1
+    5    -24.6173062961019831    -1.44e-03  4.56e-04  1.15e-03  7.64e-04     0.1
                *** Restarting incremental Fock matrix formation ***
-    6    -24.9656948305079709    -1.22e-06  4.32e-04  1.50e-03  1.06e-04     0.0
-    7    -24.9656948095219917     2.10e-08  8.71e-05  3.03e-04  6.16e-05     0.0
-    8    -24.9656948282817730    -1.88e-08  1.10e-05  3.41e-05  1.13e-05     0.0
-    9    -24.9656948287989451    -5.17e-10  2.94e-06  9.85e-06  1.88e-06     0.0
+    6    -24.6173073170990797    -1.02e-06  5.32e-04  1.78e-03  1.22e-04     0.0
+    7    -24.6173074131549399    -9.61e-08  8.09e-05  2.75e-04  5.82e-05     0.0
+    8    -24.6173074301799772    -1.70e-08  1.57e-05  3.73e-05  1.39e-05     0.1
+    9    -24.6173074309707012    -7.91e-10  3.74e-06  1.22e-05  1.98e-06     0.0
                  **** Energy Check signals convergence ****
 
                *****************************************************
@@ -601,37 +591,37 @@ Iteration    Energy (Eh)           Delta-E    RMSDP     MaxDP     MaxGrad    Tim
 TOTAL SCF ENERGY
 ----------------
 
-Total Energy       :        -24.96569482882315 Eh            -679.35109 eV
+Total Energy       :        -24.61730743099671 Eh            -669.87099 eV
 
 Components:
 Nuclear Repulsion  :          2.14763477394481 Eh              58.44011 eV
-Electronic Energy  :        -27.11332960276795 Eh            -737.79121 eV
-One Electron Energy:        -37.21054052603323 Eh           -1012.55028 eV
-Two Electron Energy:         10.09721092326528 Eh             274.75908 eV
+Electronic Energy  :        -26.76494220494152 Eh            -728.31110 eV
+One Electron Energy:        -37.15167564424394 Eh           -1010.94849 eV
+Two Electron Energy:         10.38673343930242 Eh             282.63739 eV
 
 Virial components:
-Potential Energy   :        -50.00414675823659 Eh           -1360.68201 eV
-Kinetic Energy     :         25.03845192941345 Eh             681.33092 eV
-Virial Ratio       :          1.99709418534359
+Potential Energy   :        -49.58955684085230 Eh           -1349.40044 eV
+Kinetic Energy     :         24.97224940985559 Eh             679.52945 eV
+Virial Ratio       :          1.98578654357349
 
 DFT components:
-N(Alpha)           :        3.000000154010 electrons
-N(Beta)            :        3.000000154010 electrons
-N(Total)           :        6.000000308020 electrons
-E(X)               :       -3.610889476941 Eh       
-E(C)               :       -0.348845359541 Eh       
-E(XC)              :       -3.959734836483 Eh       
+N(Alpha)           :        3.000000169130 electrons
+N(Beta)            :        3.000000169130 electrons
+N(Total)           :        6.000000338259 electrons
+E(X)               :       -3.598069832942 Eh       
+E(C)               :        0.000000000000 Eh       
+E(XC)              :       -3.598069832942 Eh       
 
 ---------------
 SCF CONVERGENCE
 ---------------
 
-  Last Energy change         ...    5.1717e-10  Tolerance :   1.0000e-08
-  Last MAX-Density change    ...    9.8536e-06  Tolerance :   1.0000e-07
-  Last RMS-Density change    ...    2.9432e-06  Tolerance :   5.0000e-09
-  Last DIIS Error            ...    7.9869e-04  Tolerance :   5.0000e-07
-  Last Orbital Gradient      ...    1.8780e-06  Tolerance :   1.0000e-05
-  Last Orbital Rotation      ...    1.8464e-06  Tolerance :   1.0000e-05
+  Last Energy change         ...    7.9072e-10  Tolerance :   1.0000e-08
+  Last MAX-Density change    ...    1.2160e-05  Tolerance :   1.0000e-07
+  Last RMS-Density change    ...    3.7410e-06  Tolerance :   5.0000e-09
+  Last DIIS Error            ...    7.6413e-04  Tolerance :   5.0000e-07
+  Last Orbital Gradient      ...    1.9762e-06  Tolerance :   1.0000e-05
+  Last Orbital Rotation      ...    2.2264e-06  Tolerance :   1.0000e-05
 
 
 ----------------
@@ -639,20 +629,20 @@ ORBITAL ENERGIES
 ----------------
 
   NO   OCC          E(Eh)            E(eV) 
-   0   2.0000      -6.520786      -177.4396 
-   1   2.0000      -0.435351       -11.8465 
-   2   2.0000      -0.195854        -5.3295 
-   3   0.0000      -0.130131        -3.5411 
-   4   0.0000      -0.130131        -3.5411 
-   5   0.0000       0.101989         2.7753 
-   6   0.0000       0.229086         6.2338 
-   7   0.0000       0.263253         7.1635 
-   8   0.0000       0.263253         7.1635 
-   9   0.0000       0.344935         9.3862 
-  10   0.0000       0.562874        15.3166 
-  11   0.0000       0.618335        16.8257 
-  12   0.0000       0.618335        16.8257 
-  13   0.0000       0.654083        17.7985 
+   0   2.0000      -6.449081      -175.4884 
+   1   2.0000      -0.389166       -10.5897 
+   2   2.0000      -0.151501        -4.1225 
+   3   0.0000      -0.089728        -2.4416 
+   4   0.0000      -0.089728        -2.4416 
+   5   0.0000       0.138537         3.7698 
+   6   0.0000       0.262025         7.1301 
+   7   0.0000       0.296988         8.0815 
+   8   0.0000       0.296988         8.0815 
+   9   0.0000       0.382531        10.4092 
+  10   0.0000       0.601929        16.3793 
+  11   0.0000       0.662677        18.0323 
+  12   0.0000       0.662677        18.0323 
+  13   0.0000       0.695484        18.9251 
 *Only the first 10 virtual orbitals were printed.
 
                     ********************************
@@ -662,23 +652,23 @@ ORBITAL ENERGIES
 -----------------------
 MULLIKEN ATOMIC CHARGES
 -----------------------
-   0 H :    0.034604
-   1 B :   -0.034604
+   0 H :    0.036565
+   1 B :   -0.036565
 Sum of atomic charges:    0.0000000
 
 --------------------------------
 MULLIKEN REDUCED ORBITAL CHARGES
 --------------------------------
-  0 H s       :     0.954267  s :     0.954267
-      pz      :     0.011129  p :     0.011129
-      px      :    -0.000000
-      py      :     0.000000
-
-  1 B s       :     3.919818  s :     3.919818
-      pz      :     1.091479  p :     1.091479
+  0 H s       :     0.952442  s :     0.952442
+      pz      :     0.010993  p :     0.010993
       px      :     0.000000
       py      :     0.000000
-      dz2     :     0.023308  d :     0.023308
+
+  1 B s       :     3.921173  s :     3.921173
+      pz      :     1.092278  p :     1.092278
+      px      :     0.000000
+      py      :     0.000000
+      dz2     :     0.023114  d :     0.023114
       dxz     :     0.000000
       dyz     :     0.000000
       dx2y2   :     0.000000
@@ -693,22 +683,22 @@ MULLIKEN REDUCED ORBITAL CHARGES
 ----------------------
 LOEWDIN ATOMIC CHARGES
 ----------------------
-   0 H :   -0.045832
-   1 B :    0.045832
+   0 H :   -0.044426
+   1 B :    0.044426
 
 -------------------------------
 LOEWDIN REDUCED ORBITAL CHARGES
 -------------------------------
-  0 H s       :     1.004147  s :     1.004147
-      pz      :     0.041685  p :     0.041685
+  0 H s       :     1.003435  s :     1.003435
+      pz      :     0.040991  p :     0.040991
       px      :     0.000000
       py      :     0.000000
 
-  1 B s       :     3.653308  s :     3.653308
-      pz      :     1.251931  p :     1.251931
+  1 B s       :     3.651715  s :     3.651715
+      pz      :     1.255657  p :     1.255657
       px      :     0.000000
       py      :     0.000000
-      dz2     :     0.048928  d :     0.048928
+      dz2     :     0.048202  d :     0.048202
       dxz     :     0.000000
       dyz     :     0.000000
       dx2y2   :     0.000000
@@ -728,8 +718,8 @@ LOEWDIN REDUCED ORBITAL CHARGES
   FA   - Mayer's free valence
 
   ATOM       NA         ZA         QA         VA         BVA        FA
-  0 H      0.9654     1.0000     0.0346     0.8782     0.8782    -0.0000
-  1 B      5.0346     5.0000    -0.0346     0.8782     0.8782     0.0000
+  0 H      0.9634     1.0000     0.0366     0.8782     0.8782     0.0000
+  1 B      5.0366     5.0000    -0.0366     0.8782     0.8782     0.0000
 
   Mayer bond orders larger than 0.100000
 B(  0-H ,  1-B ) :   0.8782 
@@ -740,29 +730,74 @@ TIMINGS
 
 Total SCF time: 0 days 0 hours 0 min 0 sec 
 
-Total time                  ....       0.841 sec
-Sum of individual times     ....       0.798 sec  ( 94.9%)
+Total time                  ....       0.661 sec
+Sum of individual times     ....       0.616 sec  ( 93.1%)
 
-SCF preparation             ....       0.200 sec  ( 23.7%)
-Fock matrix formation       ....       0.406 sec  ( 48.3%)
-  Startup                   ....       0.006 sec  (  1.6% of F)
-  Coulomb formation         ....       0.168 sec  ( 41.4% of F)
-  XC integration            ....       0.178 sec  ( 43.9% of F)
-    Basis function eval.    ....       0.006 sec  (  3.4% of XC)
+SCF preparation             ....       0.060 sec  (  9.0%)
+Fock matrix formation       ....       0.283 sec  ( 42.9%)
+  Startup                   ....       0.008 sec  (  2.8% of F)
+  Coulomb formation         ....       0.008 sec  (  2.7% of F)
+  XC integration            ....       0.146 sec  ( 51.4% of F)
+    Basis function eval.    ....       0.003 sec  (  1.8% of XC)
     Density eval.           ....       0.001 sec  (  0.4% of XC)
-    XC-Functional eval.     ....       0.004 sec  (  2.2% of XC)
+    XC-Functional eval.     ....       0.002 sec  (  1.6% of XC)
     XC-Potential eval.      ....       0.001 sec  (  0.4% of XC)
 Diagonalization             ....       0.000 sec  (  0.0%)
-Density matrix formation    ....       0.031 sec  (  3.7%)
-Total Energy calculation    ....       0.010 sec  (  1.2%)
-Population analysis         ....       0.022 sec  (  2.7%)
-Orbital Transformation      ....       0.011 sec  (  1.3%)
+Density matrix formation    ....       0.074 sec  ( 11.1%)
+Total Energy calculation    ....       0.014 sec  (  2.0%)
+Population analysis         ....       0.010 sec  (  1.4%)
+Orbital Transformation      ....       0.018 sec  (  2.8%)
 Orbital Orthonormalization  ....       0.000 sec  (  0.0%)
-DIIS solution               ....       0.081 sec  (  9.7%)
-SOSCF solution              ....       0.037 sec  (  4.4%)
-Finished LeanSCF after   0.9 sec
+DIIS solution               ....       0.111 sec  ( 16.7%)
+SOSCF solution              ....       0.047 sec  (  7.1%)
+Finished LeanSCF after   0.7 sec
 
 Maximum memory used throughout the entire LEANSCF-calculation: 5.4 MB
+
+
+           ************************************************************
+           *        Program running with 8 parallel MPI-processes     *
+           *              working on a common directory               *
+           ************************************************************
+
+------------------------------------------------------------------------------
+                         ORCA PROPERTY INTEGRAL CALCULATIONS
+------------------------------------------------------------------------------
+
+GBWName                                   ... /cluster/projects/nn14654k/ylvaos/basis_set_n_funcs/functionals/lda_x/BH/inp/BH_lda_x_ccpvdz.gbw
+Number of atoms                           ...      2
+Number of basis functions                 ...     25
+Max core memory                           ...   4096 MB
+
+Dipole integrals                          ... YES
+Quadrupole integrals                      ... YES
+Linear momentum integrals                 ...  NO
+Angular momentum integrals                ...  NO
+Higher moments length integrals           ...  NO
+Higher moments velocity integrals         ...  NO
+Kinetic energy integrals                  ...  NO
+GIAO right hand sides                     ...  NO
+GIAO dipole derivative integrals          ...  NO
+SOC integrals                             ...  NO
+EPR diamagnetic integrals (GIAO)          ...  NO
+EPR gauge integrals                       ...  NO
+Field gradient integrals                  ...  NO (   0 nuclei)
+Spin-dipole/Fermi contact integrals       ...  NO (   0 nuclei)
+Contact density integrals                 ...  NO (   0 nuclei)
+Nucleus-orbit integrals                   ...  NO (   0 nuclei)
+Geometric perturbations                   ...  NO (   2 nuclei)
+
+Choice of electric origin   ... Center of mass
+Position of electric origin ... (  0.0000,  0.0000,  0.9655) 
+Choice of magnetic origin   ... GIAO
+Position of magnetic origin ... (  0.0000,  0.0000,  0.0000) 
+
+Calculating integrals                     ... Electric Dipole (Length)     done (  0.0 sec)
+Calculating integrals                     ... Electric Quadrupole (Length) done (  0.0 sec)
+
+Property integrals calculated in   0.0 sec
+
+Maximum memory used throughout the entire PROPINT-calculation: 3.6 MB
 ------------------------------------------------------------------------------
                            ORCA ORBITAL LOCALIZATION
 ------------------------------------------------------------------------------
@@ -778,9 +813,9 @@ Operator                                 ... 0
 Orbital range for localization           ... 1 to 2
 Localization criterion                   ... NEW-BOYS
 Doing the dipole integrals               ... o.k.
-Initial value of the localization sum :     3.378754
-ITERATION   0 : L=    3.4423573301 DL=  6.36e-02 (AVERGE_DL)=    0.2521964152 
-ITERATION   1 : L=    3.4423573301 DL=  0.00e+00 (AVERGE_DL)=    0.0000000000 
+Initial value of the localization sum :     3.408537
+ITERATION   0 : L=    3.4747309533 DL=  6.62e-02 (AVERGE_DL)=    0.2572815942 
+ITERATION   1 : L=    3.4747309533 DL=  0.00e+00 (AVERGE_DL)=    0.0000000000 
 LOCALIZATION SUM CONVERGED
 
 
@@ -799,13 +834,13 @@ FOUND  -   1 strongly local MO`s
        -   0 significantly delocalized MO`s
 
 Rather strongly localized orbitals:
-MO   1:   1B  -   1.040235
+MO   1:   1B  -   1.041266
 Bond-like localized orbitals:
-MO   2:   1B  -   0.476907  and   0H  -   0.523093
+MO   2:   1B  -   0.476837  and   0H  -   0.523163
 Localized MO's were stored in: /cluster/projects/nn14654k/ylvaos/basis_set_n_funcs/functionals/lda_x/BH/inp/BH_lda_x_ccpvdz.loc
 
 -------------------------   --------------------
-FINAL SINGLE POINT ENERGY       -24.965694828823
+FINAL SINGLE POINT ENERGY       -24.617307430997
 -------------------------   --------------------
 
 
@@ -826,7 +861,7 @@ Max core memory                         ...   4096 MB
 
 Electric properties:
 Dipole moment                           ... YES
-Quadrupole moment                       ...  NO
+Quadrupole moment                       ... YES
 Static polarizability (Dipole/Dipole)   ...  NO
 Static polarizability (Dipole/Quad.)    ...  NO
 Static polarizability (Quad./Quad.)     ...  NO
@@ -878,16 +913,16 @@ Method             : SCF
 Type of density    : Electron Density
 Multiplicity       :   1
 Irrep              :   0
-Energy             :   -24.9656948288231462 Eh
+Energy             :   -24.6173074309967106 Eh
 Basis              : AO
                                 X                 Y                 Z
-Electronic contribution:      0.000000001       0.000000002       0.534479152
+Electronic contribution:     -0.000000000      -0.000000000       0.528335312
 Nuclear contribution   :      0.000000000       0.000000000      -1.136688339
                         -----------------------------------------
-Total Dipole Moment    :      0.000000001       0.000000002      -0.602209187
+Total Dipole Moment    :     -0.000000000      -0.000000000      -0.608353026
                         -----------------------------------------
-Magnitude (a.u.)       :      0.602209187
-Magnitude (Debye)      :      1.530694106
+Magnitude (a.u.)       :      0.608353026
+Magnitude (Debye)      :      1.546310505
 
 
 
@@ -899,14 +934,44 @@ Rotational constants in cm-1:             0.000000            12.045723         
 Rotational constants in MHz :             0.000000        361121.686547        361121.686547 
 
 Dipole components along the rotational axes: 
-x,y,z [a.u.] :    -0.602209     0.000000     0.000000 
-x,y,z [Debye]:    -1.530694     0.000000     0.000000 
+x,y,z [a.u.] :    -0.608353    -0.000000    -0.000000 
+x,y,z [Debye]:    -1.546311    -0.000000    -0.000000 
 
  
 
 Dipole moment calculation done in   0.0 sec 
 
-Maximum memory used throughout the entire PROP-calculation: 1.3 MB
+-----------------
+QUADRUPOLE MOMENT
+-----------------
+
+Method             : SCF
+Type of density    : Electron Density
+Multiplicity       :   1
+Irrep              :   0
+Energy             :   -24.6173074309967106 Eh
+Basis              : AO
+
+                XX              YY              ZZ              XY              XZ              YZ
+  NUC        0.000000000     0.000000000     4.732216690     0.000000000     0.000000000     0.000000000
+  EL        -5.049749805    -5.049749805   -12.207022537    -0.000000000    -0.000000001    -0.000000001
+  TOT       -5.049749805    -5.049749805    -7.474805847    -0.000000000    -0.000000001    -0.000000001 (a.u.)
+            -6.792086190    -6.792086189   -10.053869503    -0.000000000    -0.000000001    -0.000000002 (Buckingham)
+
+diagonalized tensor:
+            -7.474805847    -5.049749805    -5.049749805 (a.u.)
+           -10.053869503    -6.792086190    -6.792086189 (Buckingham)
+            -6.523566627     3.261783313     3.261783314 (traceless form in Buckingham)
+
+             0.000000000    -0.956112611     0.292999445
+             0.000000000    -0.292999445    -0.956112611
+             1.000000000     0.000000000     0.000000000
+        
+Isotropic quadrupole :    -5.858101819
+
+Quadrupole moment calculation done in   0.0 sec (  0.0 sec for integrals)
+
+Maximum memory used throughout the entire PROP-calculation: 1.4 MB
 
 --------------------------------
 SUGGESTED CITATIONS FOR THIS RUN
@@ -986,10 +1051,11 @@ List of optional additional citations
 
 Timings for individual modules:
 
-Sum of individual times          ...       10.465 sec (=   0.174 min)
-Startup calculation              ...        3.877 sec (=   0.065 min)  37.0 %
-SCF iterations                   ...        4.669 sec (=   0.078 min)  44.6 %
-Property calculations            ...        1.838 sec (=   0.031 min)  17.6 %
-Orbital localization             ...        0.082 sec (=   0.001 min)   0.8 %
+Sum of individual times          ...        2.114 sec (=   0.035 min)
+Startup calculation              ...        0.429 sec (=   0.007 min)  20.3 %
+SCF iterations                   ...        1.200 sec (=   0.020 min)  56.8 %
+Property integrals               ...        0.239 sec (=   0.004 min)  11.3 %
+Property calculations            ...        0.242 sec (=   0.004 min)  11.5 %
+Orbital localization             ...        0.003 sec (=   0.000 min)   0.1 %
                              ****ORCA TERMINATED NORMALLY****
-TOTAL RUN TIME: 0 days 0 hours 0 minutes 14 seconds 647 msec
+TOTAL RUN TIME: 0 days 0 hours 0 minutes 2 seconds 869 msec

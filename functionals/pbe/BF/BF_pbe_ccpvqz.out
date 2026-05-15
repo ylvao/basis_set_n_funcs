@@ -171,9 +171,9 @@ interface, adapt or use parts of their codes:
 
 
   ***********************************
-  * Starting time: Tue May 12 10:57:40 2026
-  * Host name:     c1-129
-  * Process ID:    1638980
+  * Starting time: Fri May 15 14:01:28 2026
+  * Host name:     c1-10
+  * Process ID:    3335856
   * Working dir.:  /cluster/projects/nn14654k/ylvaos/basis_set_n_funcs/functionals/pbe/BF/out
   ***********************************
 
@@ -216,20 +216,22 @@ NAME = /cluster/projects/nn14654k/ylvaos/basis_set_n_funcs/functionals/pbe/BF/in
 |  7> end
 |  8> 
 |  9> %method
-| 10>   functional pbe
-| 11> end
-| 12> 
-| 13> %elprop
-| 14>   Dipole true
-| 15> end
-| 16> 
-| 17> * xyz 0 1
-| 18> B    0.000000000000   0.000000000000  -0.633450000000
-| 19> F    0.000000000000   0.000000000000   0.633450000000
-| 20> *
-| 21> 
-| 22> 
-| 23>                          ****END OF INPUT****
+| 10>   
+| 11>   functional pbe
+| 12> end
+| 13> 
+| 14> %elprop
+| 15>   Dipole true
+| 16>   Quadrupole true
+| 17> end
+| 18> 
+| 19> * xyz 0 1
+| 20> B    0.000000000000   0.000000000000  -0.633450000000
+| 21> F    0.000000000000   0.000000000000   0.633450000000
+| 22> *
+| 23> 
+| 24> 
+| 25>                          ****END OF INPUT****
 ================================================================================
 
                        ****************************
@@ -367,7 +369,7 @@ Time for diagonalization                   ...    0.001 sec
 Threshold for overlap eigenvalues          ... 1.000e-07
 Number of eigenvalues below threshold      ... 0
 Time for construction of square roots      ...    0.001 sec
-Total time needed                          ...    0.004 sec
+Total time needed                          ...    0.005 sec
 
 -------------------
 DFT GRID GENERATION
@@ -413,7 +415,7 @@ Average number of grid points per atom       ...    12364
 Grids setup in   0.2 sec
 Initializing property integral containers    ... done (  0.0 sec)
 
-SHARK setup successfully completed in   1.0 seconds
+SHARK setup successfully completed in   0.3 seconds
 
 Maximum memory used throughout the entire STARTUP-calculation: 30.2 MB
 
@@ -520,7 +522,7 @@ Loading Hartree-Fock densities                     ... done
 Calculating cut-offs                               ... done
 Initializing the effective Hamiltonian             ... done
 Setting up the integral package (SHARK)            ... done
-Starting the Coulomb interaction                   ... done (   0.2 sec)
+Starting the Coulomb interaction                   ... done (   0.0 sec)
 Making the grid                                    ... done (   0.0 sec)
 Mapping shells                                     ... done
 Starting the XC term evaluation                    ... done (   0.0 sec)
@@ -534,10 +536,10 @@ Diagonalizing the Hamiltonian                      ... done (   0.0 sec)
 Back transforming the eigenvectors                 ... done (   0.0 sec)
 Now organizing SCF variables                       ... done
                       ------------------
-                      INITIAL GUESS DONE (   0.3 sec)
+                      INITIAL GUESS DONE (   0.0 sec)
                       ------------------
              **** ENERGY FILE WAS UPDATED (/cluster/projects/nn14654k/ylvaos/basis_set_n_funcs/functionals/pbe/BF/inp/BF_pbe_ccpvqz.en.tmp) ****
-Finished Guess after   0.4 sec
+Finished Guess after   0.1 sec
 Maximum memory used throughout the entire GUESS-calculation: 10.0 MB
 
 
@@ -555,7 +557,7 @@ Maximum memory used throughout the entire GUESS-calculation: 10.0 MB
 Iteration    Energy (Eh)           Delta-E    RMSDP     MaxDP     DIISErr   Damp  Time(sec)
 -------------------------------------------------------------------------------------------
                ***  Starting incremental Fock matrix formation  ***
-    1    -124.5689505467348539     0.00e+00  1.88e-03  1.70e-02  1.20e-01  0.700   0.8
+    1    -124.5689505467348539     0.00e+00  1.88e-03  1.70e-02  1.20e-01  0.700   0.1
     2    -124.5749437968614899    -5.99e-03  1.43e-03  1.99e-02  3.68e-02  0.700   0.1
                                ***Turning on AO-DIIS***
     3    -124.5768626136268580    -1.92e-03  1.00e-03  1.59e-02  1.66e-02  0.700   0.1
@@ -800,31 +802,76 @@ B(  0-B ,  1-F ) :   1.3663
 TIMINGS
 -------
 
-Total SCF time: 0 days 0 hours 0 min 2 sec 
+Total SCF time: 0 days 0 hours 0 min 1 sec 
 
-Total time                  ....       2.038 sec
-Sum of individual times     ....       1.942 sec  ( 95.3%)
+Total time                  ....       1.427 sec
+Sum of individual times     ....       1.333 sec  ( 93.4%)
 
-SCF preparation             ....       0.155 sec  (  7.6%)
-Fock matrix formation       ....       1.594 sec  ( 78.2%)
-  Startup                   ....       0.005 sec  (  0.3% of F)
-  Coulomb formation         ....       1.320 sec  ( 82.8% of F)
-  XC integration            ....       0.231 sec  ( 14.5% of F)
-    Basis function eval.    ....       0.024 sec  ( 10.6% of XC)
-    Density eval.           ....       0.013 sec  (  5.9% of XC)
-    XC-Functional eval.     ....       0.006 sec  (  2.8% of XC)
-    XC-Potential eval.      ....       0.040 sec  ( 17.4% of XC)
+SCF preparation             ....       0.069 sec  (  4.9%)
+Fock matrix formation       ....       1.044 sec  ( 73.1%)
+  Startup                   ....       0.009 sec  (  0.8% of F)
+  Coulomb formation         ....       0.673 sec  ( 64.5% of F)
+  XC integration            ....       0.280 sec  ( 26.8% of F)
+    Basis function eval.    ....       0.020 sec  (  7.2% of XC)
+    Density eval.           ....       0.011 sec  (  4.0% of XC)
+    XC-Functional eval.     ....       0.005 sec  (  1.8% of XC)
+    XC-Potential eval.      ....       0.030 sec  ( 10.7% of XC)
 Diagonalization             ....       0.000 sec  (  0.0%)
-Density matrix formation    ....       0.033 sec  (  1.6%)
-Total Energy calculation    ....       0.010 sec  (  0.5%)
-Population analysis         ....       0.011 sec  (  0.5%)
-Orbital Transformation      ....       0.013 sec  (  0.7%)
+Density matrix formation    ....       0.063 sec  (  4.4%)
+Total Energy calculation    ....       0.016 sec  (  1.1%)
+Population analysis         ....       0.008 sec  (  0.6%)
+Orbital Transformation      ....       0.021 sec  (  1.5%)
 Orbital Orthonormalization  ....       0.000 sec  (  0.0%)
-DIIS solution               ....       0.056 sec  (  2.8%)
-SOSCF solution              ....       0.069 sec  (  3.4%)
-Finished LeanSCF after   2.1 sec
+DIIS solution               ....       0.050 sec  (  3.5%)
+SOSCF solution              ....       0.060 sec  (  4.2%)
+Finished LeanSCF after   1.4 sec
 
 Maximum memory used throughout the entire LEANSCF-calculation: 19.7 MB
+
+
+           ************************************************************
+           *        Program running with 8 parallel MPI-processes     *
+           *              working on a common directory               *
+           ************************************************************
+
+------------------------------------------------------------------------------
+                         ORCA PROPERTY INTEGRAL CALCULATIONS
+------------------------------------------------------------------------------
+
+GBWName                                   ... /cluster/projects/nn14654k/ylvaos/basis_set_n_funcs/functionals/pbe/BF/inp/BF_pbe_ccpvqz.gbw
+Number of atoms                           ...      2
+Number of basis functions                 ...    124
+Max core memory                           ...   4096 MB
+
+Dipole integrals                          ... YES
+Quadrupole integrals                      ... YES
+Linear momentum integrals                 ...  NO
+Angular momentum integrals                ...  NO
+Higher moments length integrals           ...  NO
+Higher moments velocity integrals         ...  NO
+Kinetic energy integrals                  ...  NO
+GIAO right hand sides                     ...  NO
+GIAO dipole derivative integrals          ...  NO
+SOC integrals                             ...  NO
+EPR diamagnetic integrals (GIAO)          ...  NO
+EPR gauge integrals                       ...  NO
+Field gradient integrals                  ...  NO (   0 nuclei)
+Spin-dipole/Fermi contact integrals       ...  NO (   0 nuclei)
+Contact density integrals                 ...  NO (   0 nuclei)
+Nucleus-orbit integrals                   ...  NO (   0 nuclei)
+Geometric perturbations                   ...  NO (   2 nuclei)
+
+Choice of electric origin   ... Center of mass
+Position of electric origin ... (  0.0000,  0.0000,  0.3288) 
+Choice of magnetic origin   ... GIAO
+Position of magnetic origin ... (  0.0000,  0.0000,  0.0000) 
+
+Calculating integrals                     ... Electric Dipole (Length)     done (  0.0 sec)
+Calculating integrals                     ... Electric Quadrupole (Length) done (  0.0 sec)
+
+Property integrals calculated in   0.0 sec
+
+Maximum memory used throughout the entire PROPINT-calculation: 10.4 MB
 ------------------------------------------------------------------------------
                            ORCA ORBITAL LOCALIZATION
 ------------------------------------------------------------------------------
@@ -908,7 +955,7 @@ Max core memory                         ...   4096 MB
 
 Electric properties:
 Dipole moment                           ... YES
-Quadrupole moment                       ...  NO
+Quadrupole moment                       ... YES
 Static polarizability (Dipole/Dipole)   ...  NO
 Static polarizability (Dipole/Quad.)    ...  NO
 Static polarizability (Quad./Quad.)     ...  NO
@@ -988,7 +1035,37 @@ x,y,z [Debye]:     1.068448     0.000000     0.000000
 
 Dipole moment calculation done in   0.0 sec 
 
-Maximum memory used throughout the entire PROP-calculation: 4.9 MB
+-----------------
+QUADRUPOLE MOMENT
+-----------------
+
+Method             : SCF
+Type of density    : Electron Density
+Multiplicity       :   1
+Irrep              :   0
+Energy             :  -124.5816012595831381 Eh
+Basis              : AO
+
+                XX              YY              ZZ              XY              XZ              YZ
+  NUC        0.000000000     0.000000000    18.425714788     0.000000000     0.000000000     0.000000000
+  EL        -7.944502674    -7.944502674   -28.885674791     0.000000000    -0.000000001    -0.000000000
+  TOT       -7.944502674    -7.944502674   -10.459960003     0.000000000    -0.000000001    -0.000000000 (a.u.)
+           -10.685627798   -10.685627798   -14.069003934     0.000000000    -0.000000002    -0.000000000 (Buckingham)
+
+diagonalized tensor:
+           -10.459960003    -7.944502674    -7.944502673 (a.u.)
+           -14.069003934   -10.685627799   -10.685627798 (Buckingham)
+            -6.766752272     3.383376135     3.383376137 (traceless form in Buckingham)
+
+             0.000000001     0.473967261    -0.880542466
+             0.000000000    -0.880542466    -0.473967261
+             1.000000000    -0.000000000     0.000000001
+        
+Isotropic quadrupole :    -8.782988450
+
+Quadrupole moment calculation done in   0.0 sec (  0.0 sec for integrals)
+
+Maximum memory used throughout the entire PROP-calculation: 5.0 MB
 
 --------------------------------
 SUGGESTED CITATIONS FOR THIS RUN
@@ -1064,10 +1141,11 @@ List of optional additional citations
 
 Timings for individual modules:
 
-Sum of individual times          ...       11.721 sec (=   0.195 min)
-Startup calculation              ...        4.078 sec (=   0.068 min)  34.8 %
-SCF iterations                   ...        5.921 sec (=   0.099 min)  50.5 %
-Property calculations            ...        1.704 sec (=   0.028 min)  14.5 %
-Orbital localization             ...        0.019 sec (=   0.000 min)   0.2 %
+Sum of individual times          ...        3.176 sec (=   0.053 min)
+Startup calculation              ...        0.583 sec (=   0.010 min)  18.4 %
+SCF iterations                   ...        2.080 sec (=   0.035 min)  65.5 %
+Property integrals               ...        0.242 sec (=   0.004 min)   7.6 %
+Property calculations            ...        0.267 sec (=   0.004 min)   8.4 %
+Orbital localization             ...        0.005 sec (=   0.000 min)   0.2 %
                              ****ORCA TERMINATED NORMALLY****
-TOTAL RUN TIME: 0 days 0 hours 0 minutes 16 seconds 87 msec
+TOTAL RUN TIME: 0 days 0 hours 0 minutes 4 seconds 373 msec

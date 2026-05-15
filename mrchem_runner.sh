@@ -6,8 +6,8 @@
 
 
 #SBATCH --job-name=mrchem_func_tester
-#SBATCH --time=0-10:00:00
-#SBATCH --nodes=8
+#SBATCH --time=0-20:00:00
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=256
 #SBATCH --cpus-per-task=1
 export OMP_NUM_THREADS=1
