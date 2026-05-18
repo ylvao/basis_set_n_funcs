@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 1. Define files to explicitly exclude (space-separated)
-EXCLUDE_LIST="file_runner.sh mrchem_runner.sh orca_runner.sh mw_settings.py get_xyz.py"
+EXCLUDE_LIST="file_runner.sh mrchem_runner.sh orca_runner.sh mw_settings.py get_xyz.py parameters.py"
 PATTERN=$(echo $EXCLUDE_LIST | sed 's/ /|/g')
 
 # 2. Files to include from the current folder (filtered)

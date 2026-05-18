@@ -2,11 +2,10 @@ import re
 import os
 from get_xyz import extract_geometry
 from mw_settings import calculate_energy_metrics
+from parameters import functional, basis_set, prec, system, mrchem_conv, force_new
 from what_failed import check_orca_termination, check_mrchem_termination
 
-force_new = False
-
-def create_mrchem_runner(molecule_name, functional, e_rel, Tn):
+def create_mrchem_runner(molecule_name, functional, e_rel, Tn, force_new):
     file_name = f"{molecule_name}_{functional}_{Tn}_{e_rel}"
     input_file = f"functionals/{functional}/{molecule_name}/inp/{file_name}.inp"
     output_file = f"functionals/{functional}/{molecule_name}/{file_name}.out"
@@ -53,7 +52,7 @@ sbatch "$abs/mrchem_runner.sh" "$abs_dir" "$name"
 
 
 
-def create_orca_runner(molecule_name, functional, basis_set):
+def create_orca_runner(molecule_name, functional, basis_set, force_new):
 
     file_name = f"{molecule_name}_{functional}_{basis_set}"
     input_file = f"functionals/{functional}/{molecule_name}/inp/{file_name}.inp"
@@ -98,7 +97,7 @@ sbatch "$script_dir/orca_runner.sh" "$abs_dir" "$name"
 
 
 
-def create_mrchem_input(geometry, molecule_name, functional, Tn, e_rel, order, e_conv, e_orb, do_not_want_to_converge=False):
+def create_mrchem_input(geometry, molecule_name, functional, Tn, e_rel, order, e_conv, e_orb, do_not_want_to_converge, force_new):
     """
     Parses an XYZ file and creates individual simulation input files
     for each molecule using a provided template.
@@ -124,7 +123,7 @@ def create_mrchem_input(geometry, molecule_name, functional, Tn, e_rel, order, e
             if os.path.exists(output_file):
                 if check_mrchem_termination(output_file):
                     return
-    new_runner = create_mrchem_runner(molecule_name, functional_name, filename_prec, Tn)
+    new_runner = create_mrchem_runner(molecule_name, functional_name, filename_prec, Tn, force_new)
 
     template_str = """# vim:syntax=sh:
 
@@ -225,7 +224,7 @@ SCF {
     # print(f"\nNew!\nMRChem input file created for: {name_core}\nSaved in {input_dir}\n")
 
 
-def create_orca_input(geometry, molecule_name, functional, basis_set, xc_type):
+def create_orca_input(geometry, molecule_name, functional, basis_set, xc_type, force_new):
     """
     Parses an XYZ file and creates an ORCA input file
     for the molecule using a provided template.
@@ -255,7 +254,7 @@ def create_orca_input(geometry, molecule_name, functional, basis_set, xc_type):
                 if check_orca_termination(output_file):
                     return None
                 # return print(f"Successful output already exists for: {name_core}")
-    new_runner = create_orca_runner(molecule_name, functional_name, basis_set_format)
+    new_runner = create_orca_runner(molecule_name, functional_name, basis_set_format, force_new)
 
     template_str = """! dft param_basis TightSCF
 %pal nprocs 8 end
@@ -356,82 +355,64 @@ def find_xyz_file(system):
         raise FileNotFoundError(f"No XYZ file found for system '{system}' in {geometries_dir}")
     return os.path.join(geometries_dir, matching_files[0])
 
+def append_result(result, inputs, runners):
+    if result is None:
+        return
+    inp, runner = result
+    if inp is not None:
+        inputs.append(inp)
+    if runner is not None:
+        runners.append(runner)
+
+def print_new_files(label, items):
+    if items == []:
+        return print(f"\nNo new {label} created")
+    print(f"\nNew {label} created for:")
+    for item in items:
+        print(item)
 
 
-# Global
-functional = [
-    ("gga_x_pbe",      "exchange"),
-    ("gga_c_pbe",      "correlation"),
-    ("pbe",            "functional"),
-    ("gga_x_b88",      "exchange"),
-    ("lda_x",          "exchange"),
-    ("gga_x_N12",      "exchange"),
-    ("gga_c_N12",      "correlation"),
-    ("gga_x_pw91",     "exchange"),
-    ("gga_c_pw91",     "correlation"),
-    ("hyb_gga_xc_b97", "functional"),
-    ("gga_x_pw91 gga_c_pw91", "functional"),
-    ]
 
-system     = [
-    "BF",
-    "BH",
-    "C4H6",
-    ]
 geom_file  = [find_xyz_file(sys) for sys in system]
 
-# MRChem
-prec = "T2"
-mw_params = [calculate_energy_metrics(sys, prec) for sys in system]
-e_abs, e_rel, order, e_conv, e_orb = zip(*mw_params)
-
-# Orca
-basis_set  = [
-    "def2-SVP", "def2-TZVP", "def2-QZVP",
-    "cc-pVDZ", "cc-pVTZ", "cc-pVQZ",
-    "aug-cc-pVDZ", "aug-cc-pVTZ", "aug-cc-pVQZ",
-    "pcseg-0", "pcseg-2", "pcseg-4",
-    "pc-0", "pc-2", "pc-4",
+if isinstance(prec, (list, tuple)):
+    system_data = []
+    for Tn in prec:
+        for sys_name, geom_path in zip(system, geom_file):
+            e_abs, e_rel, ord_, e_conv, e_orb = calculate_energy_metrics(sys_name, Tn)
+            system_data.append((sys_name, geom_path, Tn, e_rel, ord_, e_conv, e_orb))
+else:
+    system_data = [
+        (sys_name, geom_path, prec, *calculate_energy_metrics(sys_name, prec))
+        for sys_name, geom_path in zip(system, geom_file)
     ]
 
 new_mrchem_input = []
 new_mrchem_runners = []
 new_orca_input = []
 new_orca_runners = []
-for func in functional:
-    for sys in range(len(system)):
-        mrchem_result = create_mrchem_input(
-            geom_file[sys], system[sys], func[0], prec,
-            e_rel[sys], order[sys], e_conv[sys], e_orb[sys],
-            do_not_want_to_converge=True,
+
+for func_name, func_type in functional:
+    for sys_name, geom_path, Tn, rel, ord_, conv, orb in system_data:
+        append_result(
+            create_mrchem_input(
+                geom_path, sys_name, func_name, Tn,
+                rel, ord_, conv, orb,
+                mrchem_conv, force_new
+            ),
+            new_mrchem_input,
+            new_mrchem_runners,
         )
-        if mrchem_result is not None:
-            nmi, nwr = mrchem_result
-            if nmi is not None:
-                new_mrchem_input.append(nmi)
-            if nwr is not None:
-                new_mrchem_runners.append(nwr)
-
         for basis in basis_set:
-            orca_result = create_orca_input(
-                geom_file[sys], system[sys], func[0], basis, func[1]
+            append_result(
+                create_orca_input(
+                    geom_path, sys_name, func_name, basis, func_type, force_new
+                ),
+                new_orca_input,
+                new_orca_runners,
             )
-            if orca_result is not None:
-                noi, nor = orca_result
-                if noi is not None:
-                    new_orca_input.append(noi)
-                if nor is not None:
-                    new_orca_runners.append(nor)
 
-print(f"\nNew MRChem input file created for:")
-for inp in new_mrchem_input:
-    print(inp)
-print(f"\nNew MRChem runner file created for:")
-for runner in new_mrchem_runners:
-    print(runner)
-print(f"\nNew Orca input file created for:")
-for inp in new_orca_input:
-    print(inp)
-print(f"\nNew Orca runner file created for:")
-for runner in new_orca_runners:
-    print(runner)
+print_new_files("MRChem input file", new_mrchem_input)
+print_new_files("MRChem runner file", new_mrchem_runners)
+print_new_files("Orca input file", new_orca_input)
+print_new_files("Orca runner file", new_orca_runners)

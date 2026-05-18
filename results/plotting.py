@@ -3,14 +3,12 @@ import pandas as pd
 import json
 import os
 import numpy as np
+import sys
 
-basis_set_fams = {
-    'cc':    ['ccpvdz', 'ccpvtz', 'ccpvqz'],
-    'augcc': ['augccpvdz', 'augccpvtz', 'augccpvqz'],
-    'def2':  ['def2svp', 'def2tzvp', 'def2qzvp'],
-    'pcseg': ["pcseg0", "pcseg2", "pcseg4"],
-    'pc':    ["pc0", "pc2", "pc4"],
-}
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if repo_root not in sys.path:
+    sys.path.insert(0, repo_root)
+from parameters import basis_set_fams, basis_set
 
 def qupole_error(mol1, mol2):
     components = ('XX', 'XY', 'XZ', 'YY', 'YZ', 'ZZ')
@@ -145,20 +143,23 @@ data_df = load_and_prep_data('results/data.json')
 generate_plot(data_df, 'Total energy', 'Energy Comparison', 'Energy (Hartree)', 'energy_overlay.png')
 generate_plot(data_df, 'Total dipole moment', 'Dipole Comparison', 'Dipole (a.u.)', 'dipole_overlay.png')
 
-diff_sets = [item for fam in basis_set_fams.values() for item in fam]
-
 # Energy Diffs
 generate_plot(data_df, 'Total energy', 'Abs Energy Error', '$\Delta E$ (a.u.)', 
-              'energy_abs_T1.png', custom_order=diff_sets, ref_col='T1')
+              'energy_abs_T1.png', custom_order=basis_set, ref_col='T1')
 generate_plot(data_df, 'Total energy', 'Rel Energy Error', 'Rel $\Delta E$', 
-              'energy_rel_T1.png', custom_order=diff_sets, ref_col='T1', relative=True)
+              'energy_rel_T1.png', custom_order=basis_set, ref_col='T1', relative=True)
 
 # Dipole Diffs
 generate_plot(data_df, 'Total dipole moment', 'Abs Dipole Error', '$\Delta \mu$ (a.u.)',
-              'dipole_abs_T1.png', custom_order=diff_sets, ref_col='T1')
+              'dipole_abs_T1.png', custom_order=basis_set, ref_col='T1')
 generate_plot(data_df, 'Total dipole moment', 'Rel Dipole Error', 'Rel $\Delta \mu$',
-              'dipole_rel_T1.png', custom_order=diff_sets, ref_col='T1', relative=True)
+              'dipole_rel_T1.png', custom_order=basis_set, ref_col='T1', relative=True)
 
+# Quadrupole Diffs
+generate_plot(data_df, 'Quadrupole moment', 'Abs Quadrupole Error', '$\Delta \mu$ (a.u.)',
+              'qupole_abs_T1.png', custom_order=basis_set, ref_col='T1')
+generate_plot(data_df, 'Quadrupole moment', 'Rel Quadrupole Error', 'Rel $\Delta \mu$',
+              'qupole_rel_T1.png', custom_order=basis_set, ref_col='T1', relative=True)
 
 # # Make separate plot for all Functionals
 # functionals = sorted(data_df['Functional'].unique())
@@ -171,16 +172,16 @@ generate_plot(data_df, 'Total dipole moment', 'Rel Dipole Error', 'Rel $\Delta \
 #                   f'{func_dir}/dipole_overlay_{func}.png', func_names=[func])
 
 #     # Difference Plots (Relative to T1)
-#     diff_sets = ['ccpvdz', 'ccpvtz', 'ccpvqz', 'augccpvdz', 'augccpvtz', 'augccpvqz', 'def2svp', 'def2tzvp', 'def2qzvp']
+#     basis_set = ['ccpvdz', 'ccpvtz', 'ccpvqz', 'augccpvdz', 'augccpvtz', 'augccpvqz', 'def2svp', 'def2tzvp', 'def2qzvp']
 
 #     generate_plot(data_df, 'Total energy', 'Abs Energy Error', '$\Delta E$ (a.u.)', 
-#                 f'{func_dir}/energy_abs_T1_{func}.png', custom_order=diff_sets, ref_col='T1', func_names=[func])
+#                 f'{func_dir}/energy_abs_T1_{func}.png', custom_order=basis_set, ref_col='T1', func_names=[func])
 #     generate_plot(data_df, 'Total energy', 'Rel Energy Error', 'Rel $\Delta E$', 
-#                 f'{func_dir}/energy_rel_T1_{func}.png', custom_order=diff_sets, ref_col='T1', relative=True, func_names=[func])
+#                 f'{func_dir}/energy_rel_T1_{func}.png', custom_order=basis_set, ref_col='T1', relative=True, func_names=[func])
 #     generate_plot(data_df, 'Total dipole moment', 'Abs Dipole Error', '$\Delta \mu$ (a.u.)',
-#                 f'{func_dir}/dipole_abs_T1_{func}.png', custom_order=diff_sets, ref_col='T1', func_names=[func])
+#                 f'{func_dir}/dipole_abs_T1_{func}.png', custom_order=basis_set, ref_col='T1', func_names=[func])
 #     generate_plot(data_df, 'Total dipole moment', 'Rel Dipole Error', 'Rel $\Delta \mu$',
-#                 f'{func_dir}/dipole_rel_T1_{func}.png', custom_order=diff_sets, ref_col='T1', relative=True, func_names=[func])
+#                 f'{func_dir}/dipole_rel_T1_{func}.png', custom_order=basis_set, ref_col='T1', relative=True, func_names=[func])
 
 # # Make separate plot for all basis set families
 # for fam, basis_list in basis_set_fams.items():
