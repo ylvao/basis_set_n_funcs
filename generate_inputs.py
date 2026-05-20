@@ -2,7 +2,7 @@ import re
 import os
 from get_xyz import extract_geometry
 from mw_settings import calculate_energy_metrics
-from parameters import functional, basis_set, prec, system, mrchem_conv, force_new
+from parameters import functional, basis_set_unformatted, prec, system, mrchem_conv, force_new_run, force_new_inp
 from what_failed import check_orca_termination, check_mrchem_termination
 
 def create_mrchem_runner(molecule_name, functional, e_rel, Tn, force_new):
@@ -111,7 +111,7 @@ def create_mrchem_input(geometry, molecule_name, functional, Tn, e_rel, order, e
         
     # Create output directory and file
     input_dir = f"functionals/{functional_name}/{molecule_name}/inp"
-    output_dir = f"functionals/{functional_name}/{molecule_name}/out"
+    output_dir = f"functionals/{functional_name}/{molecule_name}"
 
     filename_prec = str(e_rel).replace("-", "")
     name_core = f"{molecule_name}_{functional_name}_{Tn}_{filename_prec}"
@@ -123,7 +123,7 @@ def create_mrchem_input(geometry, molecule_name, functional, Tn, e_rel, order, e
             if os.path.exists(output_file):
                 if check_mrchem_termination(output_file):
                     return
-    new_runner = create_mrchem_runner(molecule_name, functional_name, filename_prec, Tn, force_new)
+    new_runner = create_mrchem_runner(molecule_name, functional_name, filename_prec, Tn, force_new_run)
 
     template_str = """# vim:syntax=sh:
 
@@ -241,7 +241,7 @@ def create_orca_input(geometry, molecule_name, functional, basis_set, xc_type, f
     
     # Create output directory and file
     input_dir = f"functionals/{functional_name}/{molecule_name}/inp"
-    output_dir = f"functionals/{functional_name}/{molecule_name}/out"
+    output_dir = f"functionals/{functional_name}/{molecule_name}"
 
     basis_set_format = basis_set.lower().replace("-", "")
     name_core = f"{molecule_name}_{functional_name}_{basis_set_format}"
@@ -254,7 +254,7 @@ def create_orca_input(geometry, molecule_name, functional, basis_set, xc_type, f
                 if check_orca_termination(output_file):
                     return None
                 # return print(f"Successful output already exists for: {name_core}")
-    new_runner = create_orca_runner(molecule_name, functional_name, basis_set_format, force_new)
+    new_runner = create_orca_runner(molecule_name, functional_name, basis_set_format, force_new_run)
 
     template_str = """! dft param_basis TightSCF
 %pal nprocs 8 end
@@ -372,6 +372,7 @@ def print_new_files(label, items):
         print(item)
 
 
+basis_set = basis_set_unformatted
 
 geom_file  = [find_xyz_file(sys) for sys in system]
 
@@ -398,7 +399,7 @@ for func_name, func_type in functional:
             create_mrchem_input(
                 geom_path, sys_name, func_name, Tn,
                 rel, ord_, conv, orb,
-                mrchem_conv, force_new
+                mrchem_conv, force_new_inp
             ),
             new_mrchem_input,
             new_mrchem_runners,
@@ -406,13 +407,13 @@ for func_name, func_type in functional:
         for basis in basis_set:
             append_result(
                 create_orca_input(
-                    geom_path, sys_name, func_name, basis, func_type, force_new
+                    geom_path, sys_name, func_name, basis, func_type, force_new_inp
                 ),
                 new_orca_input,
                 new_orca_runners,
             )
 
-print_new_files("MRChem input file", new_mrchem_input)
-print_new_files("MRChem runner file", new_mrchem_runners)
-print_new_files("Orca input file", new_orca_input)
-print_new_files("Orca runner file", new_orca_runners)
+# print_new_files("MRChem input file", new_mrchem_input)
+# print_new_files("MRChem runner file", new_mrchem_runners)
+# print_new_files("Orca input file", new_orca_input)
+# print_new_files("Orca runner file", new_orca_runners)

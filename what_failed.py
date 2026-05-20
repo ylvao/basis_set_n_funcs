@@ -69,4 +69,3 @@ if __name__ == "__main__":
                 print(inp)
 
     what_failed_general()
-    # print(check_orca_termination("functionals/gga_c_N12/C4H6/C4H6_gga_c_N12_T2_3e07.out"))
