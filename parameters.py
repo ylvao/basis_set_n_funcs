@@ -22,13 +22,9 @@ basis_set_fams_unformatted = {
 
 basis_set_unformatted = [item for fam in basis_set_fams_unformatted.values() for item in fam]
 
-basis_set_fams = {
-    'cc':    ['ccpvdz', 'ccpvtz', 'ccpvqz'],
-    'augcc': ['augccpvdz', 'augccpvtz', 'augccpvqz'],
-    'def2':  ['def2svp', 'def2tzvp', 'def2qzvp'],
-    'pcseg': ["pcseg0", "pcseg2", "pcseg4"],
-    'pc':    ["pc0", "pc2", "pc4"],
-}
+basis_set_fams = {}
+for key in basis_set_fams_unformatted.keys():
+    basis_set_fams[key] = [val.replace("-", "") for val in basis_set_fams_unformatted[key]]
 
 basis_set = [item for fam in basis_set_fams.values() for item in fam]
 
@@ -46,5 +42,5 @@ need_tighter_prec =[
 
 
 mrchem_conv   = False  # True if mrchem has difficulty converging
-force_new_inp = True   # Force creating new files, even if they already exist
-force_new_run = True   # Force creating new files, even if they already exist
+force_new_inp = False  # Force creating new files, even if they already exist
+force_new_run = False  # Force creating new files, even if they already exist

@@ -17,11 +17,25 @@ def qupole_error(mol1, mol2):
     diff = np.array([q1.get(k) - q2.get(k) for k in components], dtype=float)
     return float(np.dot(diff, diff))
 
+def quadrupole_magnitude(q):
+    if not isinstance(q, dict):
+        return np.nan
+    vals = []
+    for k in ('XX', 'XY', 'XZ', 'YY', 'YZ', 'ZZ'):
+        v = q.get(k, 0.0)
+        try:
+            vals.append(float(v))
+        except (TypeError, ValueError):
+            vals.append(0.0)
+    return float(np.linalg.norm(vals))
+
+
 def load_and_prep_data(filepath):
     with open(filepath, 'r') as f:
         data = json.load(f)
     df = pd.DataFrame(list(data.values()))
     df['Basis_or_Precision'] = df['Basis set'].fillna('') + df['Precision'].fillna('')
+    df['Quadrupole magnitude'] = df['Quadrupole moment'].apply(quadrupole_magnitude)
     return df
 
 def generate_plot(df, metric, title_prefix, ylabel, filename, 
@@ -138,28 +152,31 @@ def generate_plot(df, metric, title_prefix, ylabel, filename,
 
 
 data_df = load_and_prep_data('results/data.json')
+T = "T1"
 
 # Standard Plots
-generate_plot(data_df, 'Total energy', 'Energy Comparison', 'Energy (Hartree)', 'energy_overlay.png')
-generate_plot(data_df, 'Total dipole moment', 'Dipole Comparison', 'Dipole (a.u.)', 'dipole_overlay.png')
+generate_plot(data_df, 'Total energy', 'Energy Comparison', 'Energy (Hartree)', 
+              'energy_overlay.png', custom_order=basis_set)
+generate_plot(data_df, 'Total dipole moment', 'Dipole Comparison', 'Dipole (a.u.)', 
+              'dipole_overlay.png', custom_order=basis_set)
 
 # Energy Diffs
 generate_plot(data_df, 'Total energy', 'Abs Energy Error', '$\Delta E$ (a.u.)', 
-              'energy_abs_T1.png', custom_order=basis_set, ref_col='T1')
+              'energy_abs_T1.png', custom_order=basis_set, ref_col=T)
 generate_plot(data_df, 'Total energy', 'Rel Energy Error', 'Rel $\Delta E$', 
-              'energy_rel_T1.png', custom_order=basis_set, ref_col='T1', relative=True)
+              'energy_rel_T1.png', custom_order=basis_set, ref_col=T, relative=True)
 
 # Dipole Diffs
 generate_plot(data_df, 'Total dipole moment', 'Abs Dipole Error', '$\Delta \mu$ (a.u.)',
-              'dipole_abs_T1.png', custom_order=basis_set, ref_col='T1')
+              'dipole_abs_T1.png', custom_order=basis_set, ref_col=T)
 generate_plot(data_df, 'Total dipole moment', 'Rel Dipole Error', 'Rel $\Delta \mu$',
-              'dipole_rel_T1.png', custom_order=basis_set, ref_col='T1', relative=True)
+              'dipole_rel_T1.png', custom_order=basis_set, ref_col=T, relative=True)
 
 # Quadrupole Diffs
-generate_plot(data_df, 'Quadrupole moment', 'Abs Quadrupole Error', '$\Delta \mu$ (a.u.)',
-              'qupole_abs_T1.png', custom_order=basis_set, ref_col='T1')
-generate_plot(data_df, 'Quadrupole moment', 'Rel Quadrupole Error', 'Rel $\Delta \mu$',
-              'qupole_rel_T1.png', custom_order=basis_set, ref_col='T1', relative=True)
+generate_plot(data_df, 'Quadrupole magnitude', 'Abs Quadrupole Error', '$\Delta Q$ (a.u.)',
+              'qupole_abs_T1.png', custom_order=basis_set, ref_col=T)
+generate_plot(data_df, 'Quadrupole magnitude', 'Rel Quadrupole Error', 'Rel $\Delta Q$',
+              'qupole_rel_T1.png', custom_order=basis_set, ref_col=T, relative=True)
 
 # # Make separate plot for all Functionals
 # functionals = sorted(data_df['Functional'].unique())

@@ -2,7 +2,7 @@ import re
 import os
 from get_xyz import extract_geometry
 from mw_settings import calculate_energy_metrics
-from parameters import functional, basis_set_unformatted, prec, system, mrchem_conv, force_new_run, force_new_inp
+from parameters import functional, basis_set_unformatted, prec, system, mrchem_conv, force_new_run, force_new_inp, need_tighter_prec
 from what_failed import check_orca_termination, check_mrchem_termination
 
 def create_mrchem_runner(molecule_name, functional, e_rel, Tn, force_new):
@@ -108,15 +108,20 @@ def create_mrchem_input(geometry, molecule_name, functional, Tn, e_rel, order, e
     else:
         functional_name = functional
         more_funcs = False
-        
+    
     # Create output directory and file
     input_dir = f"functionals/{functional_name}/{molecule_name}/inp"
     output_dir = f"functionals/{functional_name}/{molecule_name}"
 
     filename_prec = str(e_rel).replace("-", "")
     name_core = f"{molecule_name}_{functional_name}_{Tn}_{filename_prec}"
+    if name_core in need_tighter_prec:
+        e_rel = e_rel / 10
+        filename_prec = str(e_rel).replace("-", "")
+        name_core = f"{molecule_name}_{functional_name}_{Tn}_{filename_prec}"
     input_file = f"{input_dir}/{name_core}.inp"
     output_file = f"{output_dir}/{name_core}.out"
+
 
     if force_new == False:
         if os.path.exists(input_file):
@@ -210,8 +215,6 @@ SCF {
         else:
             file_content = file_content.replace("param_func", functional)
         file_content = file_content.replace("param_prec", str(e_rel))
-        if do_not_want_to_converge:
-            file_content = file_content.replace("param_prec", str(e_rel / 10))
         file_content = file_content.replace("param_order", str(order))
         file_content = file_content.replace("param_econv", str(e_conv))
         file_content = file_content.replace("param_eorb", str(e_orb))
@@ -413,7 +416,7 @@ for func_name, func_type in functional:
                 new_orca_runners,
             )
 
-# print_new_files("MRChem input file", new_mrchem_input)
-# print_new_files("MRChem runner file", new_mrchem_runners)
-# print_new_files("Orca input file", new_orca_input)
-# print_new_files("Orca runner file", new_orca_runners)
+print_new_files("MRChem input file", new_mrchem_input)
+print_new_files("MRChem runner file", new_mrchem_runners)
+print_new_files("Orca input file", new_orca_input)
+print_new_files("Orca runner file", new_orca_runners)
