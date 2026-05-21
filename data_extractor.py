@@ -2,6 +2,7 @@ import os
 import re
 import json
 from pathlib import Path
+from what_failed import check_mrchem_termination, check_orca_termination
 
 warnings = []
 
@@ -9,16 +10,28 @@ def extract_properties(name, file_path):
 
     json_file = Path("results/data.json")
     all_data = {}
-    
     # Ensure directory exists
     json_file.parent.mkdir(parents=True, exist_ok=True)
-    
+
     if json_file.exists():
         try:
             with open(json_file, 'r') as f:
                 all_data = json.load(f)
         except json.JSONDecodeError:
             all_data = {}
+
+    try:
+        has_converged = (
+            check_orca_termination(file_path) or
+            check_mrchem_termination(file_path)
+        )
+    except Exception as e:
+        print(f"Error while checking termination for {name}: {e}")
+        has_converged = False
+
+    if not has_converged:
+        warnings.append(f"Skipping {name}: no converged termination found")
+        return all_data
 
     # Logic Change: Check if entry exists AND if it is complete
     if name in all_data:
@@ -77,7 +90,7 @@ def extract_properties(name, file_path):
         if dp_temp == "N/A":
             results["Total dipole moment"] = 0.0
         else:
-            results["Total dipole moment"] = float(m_dp.group(1))
+            results["Total dipole moment"] = float(m_dp.group(1)) if m_dp else None
         results["Quadrupole moment"]["XX"] = float(m_qp.group(1)) if m_qp else None
         results["Quadrupole moment"]["XY"] = float(m_qp.group(2)) if m_qp else None
         results["Quadrupole moment"]["XZ"] = float(m_qp.group(3)) if m_qp else None
@@ -88,7 +101,11 @@ def extract_properties(name, file_path):
         results["Software"] = "mrchem"
     elif o_en:
         results["Total energy"] = float(o_en.group(1))
-        results["Total dipole moment"] = float(o_dp.group(1)) if o_dp else None
+        dp_temp = o_dp.group(1) if o_dp else None
+        if dp_temp == "N/A":
+            results["Total dipole moment"] = 0.0
+        else:
+            results["Total dipole moment"] = float(o_dp.group(1)) if o_dp else None
         results["Quadrupole moment"]["XX"] = float(o_qp.group(1)) if o_qp else None
         results["Quadrupole moment"]["YY"] = float(o_qp.group(2)) if o_qp else None
         results["Quadrupole moment"]["ZZ"] = float(o_qp.group(3)) if o_qp else None
@@ -98,7 +115,7 @@ def extract_properties(name, file_path):
         results["Basis set"] = name_parts[-1]
         results["Software"] = "orca"
     else:
-        warnings.append(f"Warning: nergies found in {name}")
+        warnings.append(f"Warning: no data found in {name}")
 
     # if Path(json_file).exists():
     try:
@@ -127,3 +144,5 @@ for root, dirs, files in os.walk("functionals"):
             extract_properties(file_name, file_path)
 for w in warnings:
     print(w)
+
+# extract_properties("PCl_gga_c_N12_ccpvtz", "functionals/gga_c_N12/PCl/PCl_gga_c_N12_ccpvtz.out")

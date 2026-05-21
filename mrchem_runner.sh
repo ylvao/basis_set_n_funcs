@@ -8,9 +8,9 @@
 #SBATCH --job-name=mrchem_func_tester
 #SBATCH --time=0-20:00:00
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=256
+#SBATCH --ntasks-per-node=16
 #SBATCH --cpus-per-task=1
-export OMP_NUM_THREADS=1
+export OMP_NUM_THREADS=16
 
 #Modules
 module --force purge --silent

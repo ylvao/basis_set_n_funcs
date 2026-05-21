@@ -9,10 +9,10 @@ LOCAL_FILES=$(ls *.py *.sh 2>/dev/null | grep -Ev "$PATTERN")
 
 # 3. Explicitly add a file from another folder
 # Replace '../other_folder/target_script.py' with your actual path
-EXTRA_FILE="results/plotting.py"
+EXTRA_FILES="results/plotting.py results/extract_error_data.py"
 
 # Combine them into one list
-FILES="$LOCAL_FILES $EXTRA_FILE"
+FILES="$LOCAL_FILES $EXTRA_FILES"
 
 # 2. Check if any files exist
 if [ -z "$FILES" ]; then

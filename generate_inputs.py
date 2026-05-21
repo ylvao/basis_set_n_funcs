@@ -141,7 +141,7 @@ MPI {
 }
 
 Molecule {
-  charge = 0
+  charge = param_q
   multiplicity = param_m
 $coords
 param_xyz
@@ -200,6 +200,7 @@ SCF {
         m_value = {"s": 1, "d": 2, "t": 3}.get(m, 1)
         s_value = (m_value - 1) / 2
         spin_bool = "true" if s_value == 0 else "false"
+        q_value = 0
 
         # Read atom coordinates
         coords_block = ""
@@ -210,6 +211,7 @@ SCF {
         file_content = template_str.replace("param_xyz", coords_block.strip())
         file_content = file_content.replace("param_spin", spin_bool)
         file_content = file_content.replace("param_m", str(m_value))
+        file_content = file_content.replace("param_q", str(q_value))
         if more_funcs == True:
             file_content = file_content.replace("param_func", functional.replace(" ", "\n"))
         else:
@@ -220,7 +222,7 @@ SCF {
         file_content = file_content.replace("param_eorb", str(e_orb))
 
         os.makedirs(input_dir, exist_ok=True)
-        os.makedirs(output_dir, exist_ok=True)
+        os.makedirs(f"{output_dir}/out", exist_ok=True)
         with open(input_file, 'w') as f:
             f.write(file_content)
     return name_core, new_runner
@@ -334,7 +336,7 @@ param_xyz
                 file_content = file_content.replace("param_corr", functional)
 
         os.makedirs(input_dir, exist_ok=True)
-        os.makedirs(output_dir, exist_ok=True)
+        os.makedirs(f"{output_dir}/out", exist_ok=True)
         with open(input_file, 'w') as f:
             f.write(file_content)
     return name_core, new_runner

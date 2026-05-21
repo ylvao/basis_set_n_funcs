@@ -3,10 +3,10 @@
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Calc parameters
-mol="C4H6"
-func="gga_c_N12"
+mol="BH"
+func="lda_x"
 t="T2"
-prec="3e08"
+prec="2e06"
 #
 
 dir="functionals/$func/$mol"
